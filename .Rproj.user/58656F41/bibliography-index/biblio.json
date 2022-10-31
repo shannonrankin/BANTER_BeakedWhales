@@ -1,0 +1,54 @@
+{
+    "sources": [
+        {
+            "DOI": "10.1016/S0031-8914(53)80099-6",
+            "author": [
+                {
+                    "family": "Dirac",
+                    "given": "P. A. M."
+                }
+            ],
+            "container-title": "Physica",
+            "id": "Dirac1953888",
+            "issue": "1-–12",
+            "issued": {
+                "date-parts": [
+                    [
+                        1953
+                    ]
+                ]
+            },
+            "page": "888-896",
+            "title": "The Lorentz transformation and absolute time",
+            "type": "article-journal",
+            "volume": "19"
+        },
+        {
+            "DOI": "10.1016/0003-4916(63)90068-X",
+            "author": [
+                {
+                    "family": "Feynman",
+                    "given": "R. P"
+                },
+                {
+                    "family": "Vernon Jr.",
+                    "given": "F. L"
+                }
+            ],
+            "container-title": "Annals of Physics",
+            "id": "Feynman1963118",
+            "issued": {
+                "date-parts": [
+                    [
+                        1963
+                    ]
+                ]
+            },
+            "page": "118-173",
+            "title": "The theory of a general quantum system interacting with a linear dissipative system",
+            "type": "article-journal",
+            "volume": "24"
+        }
+    ],
+    "project_biblios": []
+}

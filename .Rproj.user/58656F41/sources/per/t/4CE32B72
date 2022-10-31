@@ -1,0 +1,31 @@
+{
+    "id": "4CE32B72",
+    "path": "~/GitHub/BANTER_BeakedWhales/manuscript/manuscript.qmd",
+    "project_path": "manuscript/manuscript.qmd",
+    "type": "quarto_markdown",
+    "hash": "649487043",
+    "contents": "",
+    "dirty": false,
+    "created": 1667247006108.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "166,273",
+        "scrollLine": "0",
+        "rmdVisualMode": "true",
+        "rmdVisualCollapsedChunks": "",
+        "rmdVisualModeLocation": "16996:5076",
+        "rmdVisualWrapConfigured": "true",
+        "docOutlineVisible": "1"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1667254112,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1667254112861,
+    "read_only": false,
+    "read_only_alternatives": []
+}
