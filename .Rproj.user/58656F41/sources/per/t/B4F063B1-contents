@@ -1,0 +1,59 @@
+---
+name: Fun Stuff Submission
+about: Share Fun Stuff
+title: Fun Stuff Submission
+labels: ''
+assignees: shannonrankin, Kourtney-Burger
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for Sharing Fun Stuff!
+  - type: input
+    id: title
+    attributes:
+      label: Title of your Fun Stuff
+      description: Give a short, concise, and meaningful Title
+      placeholder: ex. Violin Plot Compositions
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Brief Description
+      description: Given a concise and informative description of what your Fun Stuff is, and possibly why it is so Fun
+      value: "Create beautiful Violin Plots of your Data and Export as Orchestral Compositions"
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link
+      description: Fun Stuff should be open source- provide a link so others can use the Fun Stuff
+      placeholder: listen2yourdata.com
+    validations:
+      required: true
+  - type: textarea
+    id: moreinfo
+    attributes:
+      label: Additional Info
+      description: Do you have links to other summaries or blogs on the Fun Stuff?
+      value: "CrazyCool Blog on Violin Plot Masterpieces at crazycoolblogonmusicaldata.com"
+      validations:
+       required: false
+  - type: textarea
+    id: keywords
+    attributes:
+      label: Keywords
+      description: Create a few keywords for searches!
+      render: shell
+  - type: input
+    id: image
+    attributes:
+      label: Image
+      description: Drag and Drop an informative image for aesthetics!
+      placeholder: drag and drop!
+    validations:
+      required: false
+---

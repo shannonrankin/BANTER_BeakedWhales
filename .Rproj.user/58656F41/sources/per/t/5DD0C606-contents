@@ -124,7 +124,7 @@ format:
 
 Passive acoustic monitoring (PAM) from has proven to be a valuable tool for studying populations of marine mammals (Van Parijs et al., 2009); however, the value of these studies depends on our ability to identify the sources of the sounds we are monitoring. Historically, experienced acousticians manually identify stereotyped sounds that could be reliably attributed to a given species, based on their spectral or temporal characteristics (Baumann-Pickering et al., 2013; Bittle and Duncan, 2013; Rankin and Barlow, 2005; Soldevilla et al., 2008). The dramatic increase in recordings make it impossible for experienced acousticians to manually annotate all data, and there has been an increasing need for the development of automated classification routines that can provide accurate determinations of the species responsible for the sounds.
 
-Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods (MacLeod, 2018). However, beaked whales make stereotyped echolocation clicks that have temporal and spatial characteristics that can be used to differentiate species (Baumann-Pickering et al. 2013). Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species (Barlow et al., 2021a; Baumann-Pickering et al., 2014; Simonis et al., 2020). Unfortunately, manual classification of beaked whale echolocation clicks requires analysis by trained observers using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serve to improve the efficiency and decrease the cost of analyzing large datasets.
+Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods (MacLeod, 2018). However, beaked whales make stereotyped echolocation clicks that have temporal and spatial characteristics that can be used to differentiate species (@Baumann Baumann-Pickering et al. 2013). Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species (Barlow et al., 2021a; Baumann-Pickering et al., 2014; Simonis et al., 2020). Unfortunately, manual classification of beaked whale echolocation clicks requires analysis by trained observers using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serve to improve the efficiency and decrease the cost of analyzing large datasets.
 
 BANTER is a supervised machine learning acoustic event classifier originally developed for classifying dolphin schools from acoustic recordings (Rankin et al., 2017). This hierarchical random forest event classifier relies on an initial call classifier (in the dolphin case study, this included one each for whistles, echolocation clicks, and burst pulses) followed by an event classifier. The event classifier considers the probability of assignment to species for each call in the call classifier, along with any event-level characteristics (such as call rate). BANTER is very flexible and can accommodate any number of measures from any number of detectors. While BANTER relies on multiple call types, relatively minor changes to a call detector could yield different detector results (Rankin et al., 2017). In this case, settings for a whistle & moan detector were modified to improve performance at detecting burst pulses. This approach of applying multiple call detectors (of the same type but with different settings) suggests that perhaps BANTER could be used on species that only produce one call type (or where only one call type was analyzed), as long as the settings of the automated call detector were modified such that the overall number of detections was different. This approach was successfully applied to classified echolocation clicks for narwhal and belugas (Zahn et al., 2021). For species who primarily (or exclusively) produce echolocation clicks, BANTER may serve as an option for automated machine learning classification.
 
@@ -182,7 +182,35 @@ Species encountered in the SAtlantic study dataset include Blainsville's beaked 
 
 For the SAtlantic dataset, the most accurate model considered the echolocation clicks and the ICI for an event (Detector Model: sampsize = 2, ntrees = 30,000; BANTER Model: sampsize = 1, ntrees = 300,000) and provided an overall correct classification rate of 86.9% for all four species. The sample sizes for the BANTER model was kept low (sampsize = 1) to retain Sowerby's beaked whale, which had a sample size of 2. Analysis with a larger sample size resulted in improved classification results for Cuvier's beaked whale (see Supplement Fig. 3 for EC_ICI_ALT), but resulted in the loss of Sowerby's in the final model. Classification scores ranged from a low of 74.2% (Cuvier's beaked whale) to 100% (Sowerby's and True's beaked whale, Fig. 2); all classification results were greater than the expected error rate (Prior in Fig. 2a). Results from the EC_ICI model are presented here; results from the EC model can be found in supplementary materials (Supplement Fig. 2).
 
-\[Insert Figure 2\]\[Figure 2. BANTER classification results from the SAtlantic dataset. Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of variable importance for each species; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color. \]
+::: {layout="[[100,100], [100,100,100]]" layout-valign="bottom"}
+|             | Chinstrap | Gentoo | Adelie | **% Correct** |
+|-------------|-----------|--------|--------|---------------|
+| Chinstrap   | 70        | 0      | 0      | 100.0         |
+| Gentoo      | 0         | 5      | 0      | 100.0         |
+| Adelie      | 0         | 0      | 65     | 100.0         |
+| **Overall** | \-        | \-     | \-     | 100.0         |
+
+| LCI 0.95 | UCI 0.95 | Prior |
+|----------|----------|-------|
+| 94.9     | 100.0    | 50.0  |
+| 47.8     | 100.0    | 3.6   |
+| 94.5     | 100.0    | 46.4  |
+| 97.4     | 100.0    | 46.7  |
+
+:::: columns
+a)  ![Fig.1](Figures/myplot1.jpg){#fig-1111}
+::::
+
+:::: columns
+b)  ![Fig.2](Figures/myplot2.jpg){#fig-2222}
+::::
+
+:::: columns
+c)  ![Fig.3](Figures/myplot3.jpg){#fig-3333}
+::::
+
+Figure 2. BANTER classification results from the SAtlantic dataset. Confusion matrix provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), priors (expected error rate). Proximity plot (a) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (b) for ranks of variable importance for each species; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (c) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
+:::
 
 For SAtlantic, the proximity plot (Fig. 2b) shows that True's beaked whales are differentiated from the other species based solely on the two most important features. The importance heat map (Fig. 2c) shows that Cuvier's, Gervais' and Sowerby's beaked whales rely on a number of predictors that are lower in importance and there is likely greater distinction between these species than is represented by the proximity plot (Fig. 2b). The plot votes (Fig. 2d) shows a moderate number of trees in the forest were misclassified and these misclassifications included all species in the model.
 
@@ -278,11 +306,9 @@ Barlow, J., Moore, J.E., McCullough, J.L. and Griffiths, E.T., 2021. Acoustic‐
 
 Baumann-Pickering, S., McDonald, M.A., Simonis, A.E., Solsona Berga, A., Merkens, K.P., Oleson, E.M., Roch, M.A., Wiggins, S.M., Rankin, S., Yack, T.M. and Hildebrand, J.A., 2013. Species-specific beaked whale echolocation signals. J. Acoust. Soc. Am. 134(3), 2293-2301. https://doi.org/10.1121/1.4823843
 
-Baumann-Pickering, S., Roch, M.A., Brownell Jr, R.L., Simonis, A.E., McDonald, M.A., Solsona-Berga, A., Oleson, E.M., Wiggins, S.M. and Hildebrand, J.A., 2014. Spatio-temporal patterns of beaked whale
-echolocation signals in the North Pacific. PLoS One.  9(1), e86072. https://doi.org/10.1371/journal.pone.0086072
+Baumann-Pickering, S., Roch, M.A., Brownell Jr, R.L., Simonis, A.E., McDonald, M.A., Solsona-Berga, A., Oleson, E.M., Wiggins, S.M. and Hildebrand, J.A., 2014. Spatio-temporal patterns of beaked whale echolocation signals in the North Pacific. PLoS One.  9(1), e86072. https://doi.org/10.1371/journal.pone.0086072
 
-Baumann-Pickering, S., Wiggins, S.M., Roth, E.H., Roch, M.A., Schnitzler, H.U. and Hildebrand, J.A., 2010. Echolocation signals of a beaked whale at Palmyra Atoll. J. Acoust. Soc. Am. 127(6),
-3790-3799. https://doi.org/10.1121/1.3409478
+Baumann-Pickering, S., Wiggins, S.M., Roth, E.H., Roch, M.A., Schnitzler, H.U. and Hildebrand, J.A., 2010. Echolocation signals of a beaked whale at Palmyra Atoll. J. Acoust. Soc. Am. 127(6), 3790-3799. https://doi.org/10.1121/1.3409478
 
 Bittle, M. and Duncan, A., 2013. A review of current marine mammal detection and classification algorithms for use in automated passive acoustic monitoring. In Proceedings of Acoustics: Science, Technology and Amenity. 2013, 1-8.
 
@@ -296,13 +322,13 @@ McDonald, M.A., Hildebrand, J.A., Wiggins, S.M., Johnston, D.W. and Polovina, J.
 
 R Core Team, 2014. R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL http://www.R-project.org/
 
-Rankin, S., and Archer, F., 2021. BANTER: A User\'s Guide to Acoustic Classification. https://taikisan21.github.io/PAMpal/banterGuide.html
+Rankin, S., and Archer, F., 2021. BANTER: A User's Guide to Acoustic Classification. https://taikisan21.github.io/PAMpal/banterGuide.html
 
 Rankin, S., Archer, F., Keating, J.L., Oswald, J.N., Oswald, M., Curtis, A. and Barlow, J., 2017. Acoustic classification of dolphins in the California Current using whistles, echolocation clicks, and burst pulses. Mar. Mamm. Sci. 33(2), 520-540. https://doi.org/10.1111/mms.12381
 
-Rankin, S. and Barlow, J., 2005. Source of the North Pacific \"boing\" sound attributed to minke whales. J. Acoust. Soc. Am. 118(5), 3346-3351. https://doi.org/10.1121/1.2046747
+Rankin, S. and Barlow, J., 2005. Source of the North Pacific "boing" sound attributed to minke whales. J. Acoust. Soc. Am. 118(5), 3346-3351. https://doi.org/10.1121/1.2046747
 
-Soldevilla, M.S., Henderson, E.E., Campbell, G.S., Wiggins, S.M., Hildebrand, J.A. and Roch, M.A., 2008. Classification of Risso\'s and Pacific white-sided dolphins using spectral properties of echolocation clicks. J. Acoust. Soc. Am. 124(1), 609-624. https://doi.org/10.1121/1.2932059
+Soldevilla, M.S., Henderson, E.E., Campbell, G.S., Wiggins, S.M., Hildebrand, J.A. and Roch, M.A., 2008. Classification of Risso's and Pacific white-sided dolphins using spectral properties of echolocation clicks. J. Acoust. Soc. Am. 124(1), 609-624. https://doi.org/10.1121/1.2932059
 
 Sakai, T. 2021. PAMpal: Load and Process Passive Acoustic Data. R package version 0.13.0.
 
@@ -310,5 +336,4 @@ Simonis, A.E., Brownell Jr, R.L., Thayre, B.J., Trickey, J.S., Oleson, E.M., Hun
 
 Van Parijs, S.M., Clark, C.W., Sousa-Lima, R.S., Parks, S.E., Rankin, S., Risch, D. and Van Opzeeland, I.C., 2009. Management and research applications of real-time and archival passive acoustic sensors over varying temporal and spatial scales. Mar. Ecol. Progr. Ser. 395, pp.21-36. https://doi.org/10.3354/meps08123
 
-Zahn, M.J., Rankin, S., McCullough, J.L., Koblitz, J.C., Archer, F., Rasmussen, M.H. and Laidre, K.L., 2021. Acoustic differentiation and classification of wild belugas and narwhals using echolocation clicks. Sci.
-Rep. 11(1), pp.1-16. https://doi.org/10.1038/s41598-021-01441-w
+Zahn, M.J., Rankin, S., McCullough, J.L., Koblitz, J.C., Archer, F., Rasmussen, M.H. and Laidre, K.L., 2021. Acoustic differentiation and classification of wild belugas and narwhals using echolocation clicks. Sci. Rep. 11(1), pp.1-16. https://doi.org/10.1038/s41598-021-01441-w

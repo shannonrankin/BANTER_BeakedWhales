@@ -1,0 +1,6 @@
+"0","jpeg(filename=""Figures/myplot4.jpg"")"
+"0","ggplot(data = penguins, aes(x = flipper_length_mm)) +"
+"0","  geom_histogram(aes(fill = species)) +"
+"0","  labs(x = ""Flipper length (mm)"","
+"0","       y = ""Frequency"","
+"0","       title = ""Penguin flipper lengths"")"
