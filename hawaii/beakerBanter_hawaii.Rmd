@@ -1,0 +1,261 @@
+---
+title: "beakerbanter_hawaii"
+author: "Shannon Rankin"
+date: "2022-12-07"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE, cache=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+# When this rmarkdown file is knit:
+# FALSE means it will used saved .rds files instead of re-processing
+# TRUE will run everything from scratch - this will take a long time
+freshRun <- FALSE
+```
+
+## Data Processing for Beaked Whales: Hawaii
+
+Start by loading the required packages
+
+```{r, results=FALSE}
+library(PAMpal)
+library(banter)
+library(rfPermute)
+library(here)
+here()
+```
+
+### PAMpal Processing
+
+1.  Set up our PPS (PAMPal Settings Object) for the Hawaii dataset
+
+```{r, eval=freshRun}
+pps <- PAMpalSettings(db='Database/', 
+                      binaries = 'Binaries/',
+                      sr_hz='auto', 
+                      winLen_sec=.0025, 
+                      filterfrom_khz=10, 
+                      filterto_khz=NULL)
+```
+
+2.  Process data and save to file to eliminate repeated processing.
+
+***If*** this is the initial processing, ensure you have set 'freshRun =
+TRUE' in code chunk at the top of this document so that you will run the
+processPGDetections code and save the data as an rds file. In this case,
+it will take some time to run, and we will check for warning messages
+during processing.
+
+```{r, eval=freshRun}
+data <- processPgDetections(pps, mode='db', id='hawaii_bw')
+saveRDS(data, 'hawaii_study.rds')
+# Double check warning messages
+print(getWarnings(data)$message)
+```
+
+***If*** you have already run the processing code, ensure you have set
+'freshRun = FALSE' in code chunk at the top of this document so that you
+will read in the existing .rds file and check for warning messages.
+
+```{r, include=FALSE, eval=!freshRun}
+data <- readRDS('hawaii_study.rds')
+# Double check warning messages
+print(getWarnings(data)$message)
+```
+
+3.  Assign species identity according to original PAMguard labels, then
+    relabel for consistency across projects.
+
+```{r}
+data <- setSpecies(data, 'pamguard')
+reSpecies <- readRDS('species.rds')
+print(reSpecies)
+data <- setSpecies(data, 'reassign', value=reSpecies)
+```
+
+4.  Filter out unwanted data: (1) subset and rename species for BANTER
+    model and (2) filter to retain only Channel 1.
+
+```{r}
+goodSpecies<- c("ZC", "MD", "BW", "BWC", "IP", "BW", "possBW")
+data <- filter(data, species %in% goodSpecies)
+data <- setSpecies(data, method='reassign',
+                   value=data.frame(old=c('ZC', 'MD', 'BWC', 'IP'), new=c("Cuviers", "Blainsvilles", "CrossSeamount", "Indopacetus")))
+data_ch1only <- filter(data, Channel == '1')
+```
+
+5.  Calculate Inter-Click Interval (ICI).
+
+```{r}
+data_ch1only <- calculateICI(data_ch1only, time='peakTime')
+```
+
+6.  Export data for BANTER (and drop species codes that will not be used
+    for training). We will create two datasets: one with ICI and one
+    without ICI, and save these for import into BANTER.
+
+```{r, eval=freshRun}
+banter_data <- export_banter(data_ch1only, dropSpecies = c('BW', 'possBW'), 
+                         dropVars = c('All_ici'), training=TRUE)
+saveRDS(banter_data, file='hawaii_banter_data.rds')
+
+banter_data_ici <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), training=TRUE)
+saveRDS(banter_data_ici, file='hawaii_banter_data_ici.rds')
+```
+
+### Build a BANTER Classification Model
+
+#### *Model without ICI*
+
+Load data, initialize a BANTER model, and create an initial BANTER
+detector model (stage 1).
+
+```{r, include=FALSE, eval=!freshRun}
+banter_model <- readRDS('hawaii_banter_model_t5e3s10_t10e3s4.rds')
+```
+
+```{r, eval=freshRun}
+banter_model <- initBanterModel(banter_data$events)
+banter_model <- addBanterDetector(banter_model, banter_data$detectors, ntree=5e3, sampsize=10, importance = TRUE)
+```
+
+Check for stability (are more trees needed?) before moving on
+
+```{r}
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 0:2))
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 3:5))
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 6))
+summary(banter_model)
+```
+
+Run BANTER Event Model (stage 2)
+
+```{r, eval=freshRun}
+banter_model <- runBanterModel(banter_model, ntree=10e3, sampsize=4)
+summary(banter_model)
+```
+
+Check for stability (are more trees needed?). If acceptable, save model
+with tree/sampsize info in the filename.
+
+```{r, eval=freshRun}
+saveRDS(banter_model, 'hawaii_banter_model_t5e3s10_t10e3s4.rds')
+```
+
+#### *ICI Model*
+
+Load data, initialize a BANTER model, and create an initial BANTER
+detector model (stage 1).
+
+```{r, include=FALSE, eval=!freshRun}
+banter_model_ici <- readRDS('hawaii_banter_model_ici_t5e3s5_t10e3s4.rds')
+```
+
+```{r, eval=freshRun}
+banter_model_ici <- initBanterModel(banter_data_ici$events)
+# was 30e3 / 1 in SRs initial, too much memory. 5e3/1 is 210mb and takes ~10min
+banter_model_ici <- addBanterDetector(banter_model_ici, banter_data_ici$detectors, ntree=5e3, sampsize=5, importance = TRUE)
+```
+
+Check for stability to see if we need more trees
+
+```{r}
+plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 0:2))
+plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 3:5))
+plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 6))
+summary(banter_model_ici)
+```
+
+Run BANTER Event Model (stage 2)
+
+```{r, eval=freshRun}
+banter_model_ici <- runBanterModel(banter_model_ici, ntree=10e3, sampsize=4)
+summary(banter_model_ici)
+```
+
+Check for stability (are more trees needed?). If acceptable, save model
+with tree/sampsize info in the filename.
+
+```{r, eval=freshRun}
+saveRDS(banter_model_ici, 'hawaii_banter_model_ici_t5e3s5_t10e3s4.rds')
+```
+
+### BANTER Analytics
+
+There are a number of visualizations/data products that allow us to
+visualize our BANTER classifier; most use the rfPermute package (see
+[BANTER
+Guidelines](https://taikisan21.github.io/PAMpal/banterGuide.html) for
+more information)
+
+First, identify the model you would like to examine (comment out the
+model you [do not]{.underline} want to examine).
+
+```{r}
+#model <- banter_model_ici
+model <- banter_model
+```
+
+Extract the Random Forest model object from our BANTER model for
+analysis.
+
+```{r}
+banter_model_RF <- getBanterModel(model)
+```
+
+Confusion Matrix
+
+```{r, include=TRUE}
+hawaii_confuseMatrix <- confusionMatrix(banter_model_RF)
+```
+
+Class Priors (Expected Error Rate)
+
+```{r, include=TRUE}
+hawaii_priors <- classPriors(banter_model_RF, NULL)
+```
+
+Plot Confusion Matrix Heat Map
+
+```{r, include=TRUE}
+plotConfMat(banter_model_RF, title="ConfusionMatrix", plot=TRUE)
+```
+
+Plot Error Trace for Banter Model
+
+```{r, include=TRUE}
+plot(banter_model_RF)
+```
+
+PlotVotes
+
+```{r, include=TRUE}
+png("hawaii_votes.png", width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_RF)
+dev.off()
+```
+
+Importance Heatmap
+
+```{r, include=TRUE}
+png("hawaii_importance.png", width = 30, height = 25, units = 'cm',  res = 300)
+plotImportance(banter_model_RF, plot.type="heatmap")
+dev.off()
+```
+
+Proximity Plot
+
+```{r, include=TRUE}
+png("hawaii_proximity.png", width = 20, height = 20, units = 'cm',  res = 300)
+hawaii_proximityPlot <- plotProximity(banter_model_RF)
+dev.off()
+```
+
+Plot Predicted Probabilities
+
+```{r, include=TRUE}
+plotPredictedProbs(banter_model_RF, bins=30, plot=TRUE)
+```

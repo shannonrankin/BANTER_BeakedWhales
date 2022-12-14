@@ -4,9 +4,9 @@
 \PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
 %
 \documentclass[
-  authoryear,
-  preprint,
-  3p]{elsarticle}
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -39,7 +39,7 @@
 \usepackage{xcolor}
 \usepackage[normalem]{ulem}
 \setlength{\emergencystretch}{3em} % prevent overfull lines
-\setcounter{secnumdepth}{5}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 % Make \paragraph and \subparagraph free-standing
 \ifx\paragraph\undefined\else
   \let\oldparagraph\paragraph
@@ -115,7 +115,31 @@
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newlength{\cslentryspacingunit} % times entry-spacing
+\setlength{\cslentryspacingunit}{\parskip}
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
+  \fi
+  % set entry spacing
+  \setlength{\parskip}{#2\cslentryspacingunit}
+ }%
+ {}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
 
+\KOMAoption{captions}{tableheading}
 \makeatletter
 \makeatother
 \makeatletter
@@ -167,12 +191,9 @@
 \makeatother
 \makeatletter
 \makeatother
-\journal{Journal Name}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
-\usepackage[]{natbib}
-\bibliographystyle{elsarticle-harv}
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same} % disable monospaced font for URLs
@@ -189,66 +210,15 @@ whale},
   urlcolor={Blue},
   pdfcreator={LaTeX via pandoc}}
 
-\setlength{\parindent}{6pt}
-\begin{document}
-
-\begin{frontmatter}
 \title{Open-Source machine learning BANTER acoustic classification of a
 cryptic echolocating species}
-\author[1]{Shannon Rankin%
-\corref{cor1}%
-\fnref{fn1}}
- \ead{shannon.rankin@noaa.gov} 
-\author[1]{Taiki Sakai%
-%
-\fnref{fn2}}
- \ead{taiki.sakai@noaa.gov} 
-\author[1]{Frederick Archer%
-%
-\fnref{fn3}}
- \ead{eric.archer@noaa.gov} 
-\author[]{Jay Barlow%
-%
-}
- \ead{jaybarlow33@yahoo.com} 
-\author[]{Danielle Cholewiak%
-%
-}
- \ead{danielle.cholewiak@noaa.gov} 
-\author[]{Annamaria DeAngelis%
-%
-}
- \ead{annamaria.deangelis@noaa.gov} 
-\author[]{Jennifer L. K. McCullough%
-%
-}
- \ead{jennifer.mccullough@noaa.gov} 
-\author[]{Erin Oleson%
-%
-}
- \ead{erin.oleson@noaa.gov} 
-\author[]{Melissa Soldevilla%
-%
-}
- \ead{melissa.soldevilla@noaa.gov} 
+\author{Shannon Rankin \and Taiki Sakai \and Frederick Archer \and Jay
+Barlow \and Danielle Cholewiak \and Annamaria DeAngelis \and Jennifer L.
+K. McCullough \and Erin Oleson \and Melissa Soldevilla}
+\date{12/12/22}
 
-\affiliation[1]{organization={Southwest Fisheries Science Center, Marine
-Mammal \& Turtle Division},addressline={8901 La Jolla Shores
-Dr.},city={La Jolla},postcode={92037},postcodesep={}}
-
-\cortext[cor1]{Corresponding author}
-\fntext[fn1]{This is the first author footnote.}
-\fntext[fn2]{Another author footnote, this is a very long footnote and
-it should be a really long footnote. But this footnote is not yet
-sufficiently long enough to make two lines of footnote text.}
-\fntext[fn3]{Yet another author footnote.}
-
-
-
-
-
-
-        
+\begin{document}
+\maketitle
 \begin{abstract}
 Passive acoustic monitoring is increasingly used for assessing
 populations of marine mammals; however, analysis of large datasets is
@@ -268,19 +238,7 @@ automated detectors. These methods provide a highly automated approach
 to acoustic detection and classification using open source methods that
 can be readily adopted for species and geographic regions.
 \end{abstract}
-
-
-
-
-
-\begin{keyword}
-    bioacoustics \sep machine learning \sep random forest \sep species
-classification \sep marine mammals \sep passive acoustic
-monitoring \sep 
-    beaked whale
-\end{keyword}
-\end{frontmatter}
-    \ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[enhanced, boxrule=0pt, frame hidden, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable, sharp corners]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, sharp corners, borderline west={3pt}{0pt}{shadecolor}, interior hidden, breakable, enhanced, frame hidden]}{\end{tcolorbox}}\fi
 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
@@ -715,14 +673,39 @@ classification trials included (1) echolocation clicks (EC), and (2)
 echolocation clicks and ICI (EC\_ICI).
 
 The most accurate model considered the echolocation clicks only
-(Detector Model: sampsize = 10, ntrees = 30,000; BANTER model: sampsize
-= 4, ntree = 200,000) and provided an overall correct classification
-rate of 89.7\% for all four species. Classification scores ranged from a
-low of 82.1\% (Cross Seamount Beaked Whale) to 96.7\% (Longman's beaked
+(Detector Model: sampsize = 10, ntrees = 5,000; BANTER model: sampsize =
+4, ntree = 10,000) and provided an overall correct classification rate
+of 91.8\% for all four species. Classification scores ranged from a low
+of 84.5\% (Cross Seamount Beaked Whale) to 97.5\% (Longman's beaked
 whale, Fig. 3). ~All classification results were greater than the
 expected error rate (Prior in Fig. 3a). Results from the EC model are
 presented here; results from EC\_ICI model can be found in supplementary
 materials (Supplement Fig. 4).
+
+::: kable(hawaii/hawaii\_confuseMatrix) :::
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\tightlist
+\item
+  \href{hawaii/hawaii_proximity.png}{Fig.1}
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  \href{hawaii/hawaii_importance.png}{Fig.2}
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  \href{hawaii/hawaii_votes.png}{Fig.3}
+\end{enumerate}
 
 {[}Insert Figure 3{]}{[}Figure 3. BANTER classification results from the
 Hawaii dataset. Confusion matrix (a) provides the percent correct
@@ -966,8 +949,8 @@ provided by U.S. Navy, Bureau of Ocean Energy Management, and the
 National Oceanographic and Atmospheric Administration. The manuscript
 was improved thanks to reviews from {[}XXXX{]}.
 
-Here are two sample references: \citet{Feynman1963118}
-\citet{Dirac1953888}.
+Here are two sample references: Feynman and Vernon Jr. (1963) Dirac
+(1953).
 
 By default, natbib will be used with the \texttt{authoryear} style, set
 in \texttt{classoption} variable in YAML. You can sets extra options
@@ -1138,8 +1121,21 @@ Rasmussen, M.H. and Laidre, K.L., 2021. Acoustic differentiation and
 classification of wild belugas and narwhals using echolocation clicks.
 Sci. Rep.~11(1), pp.1-16. https://doi.org/10.1038/s41598-021-01441-w
 
+\hypertarget{refs}{}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-Dirac1953888}{}}%
+Dirac, P. A. M. 1953. {``The {Lorentz} Transformation and Absolute
+Time.''} \emph{Physica} 19 (1-\/--12): 888--96.
+\url{https://doi.org/10.1016/S0031-8914(53)80099-6}.
 
-  \bibliography{bibliography.bib}
+\leavevmode\vadjust pre{\hypertarget{ref-Feynman1963118}{}}%
+Feynman, R. P, and F. L Vernon Jr. 1963. {``The Theory of a General
+Quantum System Interacting with a Linear Dissipative System.''}
+\emph{Annals of Physics} 24: 118--73.
+\url{https://doi.org/10.1016/0003-4916(63)90068-X}.
+
+\end{CSLReferences}
+
 
 
 \end{document}

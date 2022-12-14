@@ -111,12 +111,13 @@ keywords:
 date: last-modified
 bibliography: bibliography.bib
 format:
+  pdf: default
   elsevier-pdf:
     keep-tex: true
     journal:
-      name: Journal Name
+      name: Ecological Informatics
       formatting: preprint
-      model: 3p
+      model: 1p
       cite-style: authoryear
 ---
 
@@ -124,7 +125,7 @@ format:
 
 Passive acoustic monitoring (PAM) from has proven to be a valuable tool for studying populations of marine mammals (Van Parijs et al., 2009); however, the value of these studies depends on our ability to identify the sources of the sounds we are monitoring. Historically, experienced acousticians manually identify stereotyped sounds that could be reliably attributed to a given species, based on their spectral or temporal characteristics (Baumann-Pickering et al., 2013; Bittle and Duncan, 2013; Rankin and Barlow, 2005; Soldevilla et al., 2008). The dramatic increase in recordings make it impossible for experienced acousticians to manually annotate all data, and there has been an increasing need for the development of automated classification routines that can provide accurate determinations of the species responsible for the sounds.
 
-Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods (MacLeod, 2018). However, beaked whales make stereotyped echolocation clicks that have temporal and spatial characteristics that can be used to differentiate species (@Baumann Baumann-Pickering et al. 2013). Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species (Barlow et al., 2021a; Baumann-Pickering et al., 2014; Simonis et al., 2020). Unfortunately, manual classification of beaked whale echolocation clicks requires analysis by trained observers using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serve to improve the efficiency and decrease the cost of analyzing large datasets.
+Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods (MacLeod, 2018). However, beaked whales make stereotyped echolocation clicks that have temporal and spatial characteristics that can be used to differentiate species (Baumann-Pickering et al. 2013). Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species (Barlow et al., 2021a; Baumann-Pickering et al., 2014; Simonis et al., 2020). Unfortunately, manual classification of beaked whale echolocation clicks requires analysis by trained observers using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serve to improve the efficiency and decrease the cost of analyzing large datasets.
 
 BANTER is a supervised machine learning acoustic event classifier originally developed for classifying dolphin schools from acoustic recordings (Rankin et al., 2017). This hierarchical random forest event classifier relies on an initial call classifier (in the dolphin case study, this included one each for whistles, echolocation clicks, and burst pulses) followed by an event classifier. The event classifier considers the probability of assignment to species for each call in the call classifier, along with any event-level characteristics (such as call rate). BANTER is very flexible and can accommodate any number of measures from any number of detectors. While BANTER relies on multiple call types, relatively minor changes to a call detector could yield different detector results (Rankin et al., 2017). In this case, settings for a whistle & moan detector were modified to improve performance at detecting burst pulses. This approach of applying multiple call detectors (of the same type but with different settings) suggests that perhaps BANTER could be used on species that only produce one call type (or where only one call type was analyzed), as long as the settings of the automated call detector were modified such that the overall number of detections was different. This approach was successfully applied to classified echolocation clicks for narwhal and belugas (Zahn et al., 2021). For species who primarily (or exclusively) produce echolocation clicks, BANTER may serve as an option for automated machine learning classification.
 
@@ -197,17 +198,17 @@ For the SAtlantic dataset, the most accurate model considered the echolocation c
 | 94.5     | 100.0    | 46.4  |
 | 97.4     | 100.0    | 46.7  |
 
-:::: columns
+::: columns
 a)  ![Fig.1](Figures/myplot1.jpg){#fig-1111}
-::::
+:::
 
-:::: columns
+::: columns
 b)  ![Fig.2](Figures/myplot2.jpg){#fig-2222}
-::::
+:::
 
-:::: columns
+::: columns
 c)  ![Fig.3](Figures/myplot3.jpg){#fig-3333}
-::::
+:::
 
 Figure 2. BANTER classification results from the SAtlantic dataset. Confusion matrix provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), priors (expected error rate). Proximity plot (a) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (b) for ranks of variable importance for each species; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (c) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
 :::
@@ -218,7 +219,21 @@ For SAtlantic, the proximity plot (Fig. 2b) shows that True's beaked whales are 
 
 The Hawaii dataset consisted of 13 drifting buoys deployed within the main Hawaiian Islands (Yano et al. 2018); species included Longman's beaked whale (n=121), Blainsville's beaked whale (n=518), Cross Seamount beaked whale (n=84) and Cuvier's beaked whale (n=201). BANTER classification trials included (1) echolocation clicks (EC), and (2) echolocation clicks and ICI (EC_ICI).
 
-The most accurate model considered the echolocation clicks only (Detector Model: sampsize = 10, ntrees = 30,000; BANTER model: sampsize = 4, ntree = 200,000) and provided an overall correct classification rate of 89.7% for all four species. Classification scores ranged from a low of 82.1% (Cross Seamount Beaked Whale) to 96.7% (Longman's beaked whale, Fig. 3).  All classification results were greater than the expected error rate (Prior in Fig. 3a). Results from the EC model are presented here; results from EC_ICI model can be found in supplementary materials (Supplement Fig. 4).
+The most accurate model considered the echolocation clicks only (Detector Model: sampsize = 10, ntrees = 5,000; BANTER model: sampsize = 4, ntree = 10,000) and provided an overall correct classification rate of 91.8% for all four species. Classification scores ranged from a low of 84.5% (Cross Seamount Beaked Whale) to 97.5% (Longman's beaked whale, Fig. 3).  All classification results were greater than the expected error rate (Prior in Fig. 3a). Results from the EC model are presented here; results from EC_ICI model can be found in supplementary materials (Supplement Fig. 4).
+
+::: kable(hawaii/hawaii_confuseMatrix) :::
+
+::: columns
+a)  [Fig.1](hawaii/hawaii_proximity.png)
+:::
+
+::: columns
+b)  [Fig.2](hawaii/hawaii_importance.png)
+:::
+
+::: columns
+c)  [Fig.3](hawaii/hawaii_votes.png)
+:::
 
 \[Insert Figure 3\]\[Figure 3. BANTER classification results from the Hawaii dataset. Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of variable importance for each species; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color. Species codes include Cross Seamount beaked whale (BWC), Longman's beaked whale (IP), Blainsville's beaked whale (MD) and Cuvier's beaked whale (ZC).
 
