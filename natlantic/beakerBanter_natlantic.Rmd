@@ -1,0 +1,309 @@
+---
+title: 'BANTER for Beaked Whales: North Atlantic'
+author: "Shannon Rankin"
+date: "2023-01-26"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# When this rmarkdown file is knit:
+# FALSE means it will used saved .rds files instead of re-processing
+# TRUE will run everything from scratch - this will take a long time
+freshRun <- FALSE
+```
+
+## PAMpal Data Processing
+
+Start by loading the required packages
+
+```{r, load packages, message=FALSE}
+library (PAMpal)
+library(banter)
+library(rfPermute)
+library(kableExtra)
+library(readxl)
+library(stringr)
+library(here)
+here()
+```
+
+1.  **Set up our PPS** (PAMPal Settings Object) for the NAtlantic
+    dataset
+
+```{r, pampal settings, eval=freshRun}
+pps <- PAMpalSettings(db='Database/', 
+                      binaries = 'Binaries/',
+                      sr_hz='auto', 
+                      winLen_sec=.0025, 
+                      filterfrom_khz=10, 
+                      filterto_khz=NULL)
+```
+
+2.  **Process data** and save to file to eliminate repeated processing.
+
+[If]{.underline} you have already run the processing code, ensure you
+have set 'freshRun = FALSE' at top of this document to read in the
+existing .rds file for downstream processing.
+
+```{r, read acoustic study, include=FALSE, eval=!freshRun}
+data <- readRDS('natlantic_study.rds')
+# Double check warning messages
+print(getWarnings(data)$message)
+```
+
+[If]{.underline} this is the [initial processing]{.underline}, ensure
+you have set 'freshRun = TRUE' at top of this document to process and
+save data. This will take some time to run.
+
+```{r, process detections, eval=freshRun}
+data <- processPgDetections(pps, mode='db', id='natlantic_bw')
+saveRDS(data, 'natlantic_study.rds')
+# Double check warning messages
+print(getWarnings(data)$message)
+```
+
+3.  **Assign species identity** according to original PAMguard labels,
+    then relabel for consistency across projects.
+
+    *Final species ID for beaked whale detections was provided by A.
+    DeAngelis as an excel spreadsheet. The following code chunk pulls
+    out the required information (event, species) in the format required
+    for PAMpal.*
+
+```{r, assign species ID}
+HB1603_BW <- read_excel("HB1603_BWs.xlsx", sheet = "Alldata")#read in data
+#create formatted event/species dataframe 
+speciesID <- HB1603_BW[c("PGId", "Final Species Classification", "Database")] %>% 
+  mutate("event" = paste(Database, PGId, sep=".OE")) %>% 
+  rename("species" = "Final Species Classification") %>% 
+  mutate("species" = str_replace_all(species, "'", ""),
+         "species" = str_replace(species, "Gervais/Trues", "BW")) %>% 
+  select(all_of(c("event", "species")))
+
+#Assign species ID to data
+data <- setSpecies(data, method='manual', value = speciesID)
+#Note: 130 detections are not given species IDs and will be filtered out at a later step.
+```
+
+4.  **Filter out unwanted data**: Subset and rename species for BANTER
+    model
+
+```{r, filter unwanted data}
+goodSpecies<- c(c("Trues", "Cuviers", "Sowerbys", "Gervais"))
+data <- filter(data, species %in% goodSpecies)
+```
+
+5.  **Calculate Inter-Click Interval** (ICI).
+
+```{r, calculate ICI}
+data <- calculateICI(data, time='peakTime')
+```
+
+6.  **Export data for BANTER** (and drop species codes that will not be
+    used for training). We will create two datasets: one with ICI and
+    one without ICI, and save these for import into BANTER.
+
+```{r, banter export, eval=freshRun}
+banter_data <- export_banter(data, dropSpecies = 'unid', 
+                         dropVars = c('All_ici'), training=TRUE)
+saveRDS(banter_data, file='natlantic_banter_data.rds')
+
+banter_data_ici <- export_banter(data, dropSpecies = 'unid', training=TRUE)
+saveRDS(banter_data_ici, file='natlantic_banter_data_ici.rds')
+```
+
+## Build a BANTER Classification Model
+
+### *Model without ICI*
+
+1.  Load data, initialize a BANTER model, and create an initial BANTER
+    detector model (stage 1).
+
+```{r, read banter model, include=FALSE, eval=!freshRun}
+banter_model <- readRDS('natlantic_banter_model_t5e3s3_t5e3s4.rds')
+```
+
+```{r, banter detector model, eval=freshRun}
+banter_model <- initBanterModel(banter_data$events)
+banter_model <- addBanterDetector(banter_model, banter_data$detectors, ntree=5e3, sampsize=3, importance = TRUE)
+```
+
+Check for stability (are more trees needed?) before moving on
+
+```{r, banter detector model stability}
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 3:4))
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 5:6))
+summary(banter_model)
+```
+
+2.  Run BANTER Event Model (stage 2)
+
+```{r, banter event model}
+banter_model <- runBanterModel(banter_model, ntree=5e3, sampsize=4)
+summary(banter_model)
+```
+
+Check for stability (are more trees needed?). If acceptable, save model
+with tree/sampsize info in the filename.
+
+```{r,save banter model, eval=freshRun}
+saveRDS(banter_model, 'natlantic_banter_model_t5e3s3_t5e3s4.rds')
+```
+
+### *ICI Model*
+
+1.  Load data, initialize a BANTER model, and create an initial BANTER
+    detector model (stage 1).
+
+```{r, read banter ici model, include=FALSE, eval=!freshRun}
+banter_model_ici <- readRDS('natlantic_banter_model_ici_t10e3s2_t10e3s4.rds')
+```
+
+```{r, banter ici detector model, eval=freshRun}
+banter_model_ici <- initBanterModel(banter_data_ici$events)
+banter_model_ici <- addBanterDetector(banter_model_ici, banter_data_ici$detectors, ntree=10e3, sampsize=2, importance = TRUE)
+```
+
+Check for stability to see if we need more trees
+
+```{r, banter ici detector model stability}
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 3:4))
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 5:6))
+summary(banter_model_ici)
+```
+
+2.  Run BANTER Event Model (stage 2)
+
+```{r, banter ici event model}
+banter_model_ici <- runBanterModel(banter_model_ici, ntree=10e3, sampsize=4)
+summary(banter_model_ici)
+```
+
+Check for stability (are more trees needed?). If acceptable, save model
+with tree/sampsize info in the filename.
+
+```{r, save banter ici model, eval=freshRun}
+saveRDS(banter_model_ici, 'natlantic_banter_model_ici_t10e3s2_t10e3s4.rds')
+```
+
+## BANTER Analytics
+
+There are a number of visualizations/data products that allow us to
+visualize our BANTER classifier; most use the rfPermute package (see
+[BANTER
+Guidelines](https://taikisan21.github.io/PAMpal/banterGuide.html) for
+more information)
+
+First, identify the model you would like to examine (comment out the
+model you [do not]{.underline} want to examine).
+
+```{r, identify model}
+model <- banter_model
+modelname <- "banter_model"
+
+model_ici <- banter_model_ici
+modelname_ici <- "banter_model_ici"
+```
+
+Extract the Random Forest model object from our BANTER model for
+analysis.
+
+```{r, extract RF model, include=TRUE}
+banter_model_RF <- getBanterModel(model)
+banter_model_ici_RF <- getBanterModel(model_ici)
+```
+
+Confusion Matrix (simple model)
+
+```{r, confusion matrix, include=TRUE}
+natlantic_confuseMatrix <- rfPermute::confusionMatrix(banter_model_RF)
+natlantic_confuseMatrix <- kable(natlantic_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(4, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(3,hline_after = TRUE)%>%
+  row_spec(4, bold = TRUE)%>%
+  save_kable(paste(modelname, "natlantic_confuseMatrix.png", sep="_"), zoom = 2)
+
+natlantic_ici_confuseMatrix <- rfPermute::confusionMatrix(banter_model_ici_RF)
+natlantic_ici_confuseMatrix <- kable(natlantic_ici_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(4, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(3,hline_after = TRUE)%>%
+  row_spec(4, bold = TRUE)%>%
+  save_kable(paste(modelname_ici, "natlantic_ici_confuseMatrix.png", sep="_"), zoom = 2)
+
+```
+
+![](banter_model_natlantic_confuseMatrix.png)
+
+Proximity Plot
+
+```{r, proximity plot, include=TRUE}
+png(paste(modelname, "natlantic_proximity.png", sep="_"), width = 20, height = 20, units = 'cm', res = 300)
+natlantic_proximityPlot <- plotProximity(banter_model_RF)
+dev.off()
+natlantic_proximityPlot <- plotProximity(banter_model_RF)
+
+png(paste(modelname_ici, "natlantic_proximity.png", sep="_"), width = 20, height = 20, units = 'cm', res = 300)
+ici_natlantic_proximityPlot <- plotProximity(banter_model_ici_RF)
+dev.off()
+ici_natlantic_proximityPlot <- plotProximity(banter_model_ici_RF)
+```
+
+Importance Heatmap
+
+```{r, importance heat map, include=TRUE}
+png(paste(modelname, "natlantic_importance.png", sep="_"), width = 30, height = 25, units = 'cm', res = 300)
+plotImportance(banter_model_RF, plot.type="heatmap")
+dev.off()
+natlantic_importance <- plotImportance(banter_model_RF, plot.type="heatmap")
+
+png(paste(modelname_ici, "natlantic_importance.png", sep="_"), width = 30, height = 25, units = 'cm', res = 300)
+plotImportance(banter_model_ici_RF, plot.type="heatmap")
+dev.off()
+ici_natlantic_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
+```
+
+PlotVotes
+
+```{r, plot votes, include=TRUE}
+png(paste(modelname, "natlantic_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_RF)
+dev.off()
+natlantic_votes <- plotVotes(banter_model_RF)
+
+png(paste(modelname_ici, "natlantic_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_ici_RF)
+dev.off()
+ici_natlantic_votes <- plotVotes(banter_model_ici_RF)
+```
+
+Class Priors (Expected Error Rate)
+
+```{r, class priors, include=TRUE}
+natlantic_priors <- classPriors(banter_model_RF, NULL)
+```
+
+Plot Confusion Matrix Heat Map
+
+```{r, confusion matrix heat map, include=TRUE}
+plotConfMat(banter_model_RF, title="ConfusionMatrix", plot=TRUE)
+```
+
+Plot Error Trace for Banter Model
+
+```{r, model error trace, include=TRUE}
+plot(banter_model_RF)
+```
+
+Plot Predicted Probabilities
+
+```{r, predicted probabilities, include=TRUE}
+plotPredictedProbs(banter_model_RF, bins=30, plot=TRUE)
+```

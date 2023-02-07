@@ -1,7 +1,7 @@
 ---
 title: "BANTER for Beaked Whales: Hawaii"
 author: "Shannon Rankin"
-date: "2022-12-07"
+date: "2022-02-06"
 output: html_document
 editor_options: 
   markdown: 
@@ -24,11 +24,12 @@ Start by loading the required packages
 library(PAMpal)
 library(banter)
 library(rfPermute)
+library(kableExtra)
 library(here)
 here()
 ```
 
-Set up our PPS (PAMPal Settings Object) for the Hawaii dataset
+1.  Set up our PPS (PAMPal Settings Object) for the Hawaii dataset
 
 ```{r, pampal settings, eval=freshRun}
 pps <- PAMpalSettings(db='Database/', 
@@ -72,7 +73,7 @@ print(reSpecies)
 data <- setSpecies(data, 'reassign', value=reSpecies)
 ```
 
-4.  Filter out unwanted data: (1) subset and rename species for BANTER
+3.  Filter out unwanted data: (1) subset and rename species for BANTER
     model and (2) filter to retain only Channel 1.
 
 ```{r, filter unwanted data}
@@ -190,8 +191,11 @@ First, identify the model you would like to examine (comment out the
 model you [do not]{.underline} want to examine).
 
 ```{r, identify model}
-#model <- banter_model_ici
 model <- banter_model
+modelname <- "banter_model"
+
+model_ici <- banter_model_ici
+modelname_ici <- "banter_model_ici"
 ```
 
 Extract the Random Forest model object from our BANTER model for
@@ -199,12 +203,72 @@ analysis.
 
 ```{r, extract RF model}
 banter_model_RF <- getBanterModel(model)
+banter_model_ici_RF <- getBanterModel(model_ici)
 ```
 
 Confusion Matrix
 
 ```{r, confusion matrix, include=TRUE}
-hawaii_confuseMatrix <- confusionMatrix(banter_model_RF)
+hawaii_confuseMatrix <- rfPermute::confusionMatrix(banter_model_RF)
+hawaii_confuseMatrix <- kable(hawaii_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(5, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(5,hline_after = TRUE)%>%
+  row_spec(5, bold = TRUE)%>%
+  save_kable(paste(modelname, "hawaii_confuseMatrix.png", sep="_"), zoom = 2)
+
+hawaii_ici_confuseMatrix <- rfPermute::confusionMatrix(banter_model_ici_RF)
+hawaii_ici_confuseMatrix <- kable(hawaii_ici_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(5, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(5,hline_after = TRUE)%>%
+  row_spec(5, bold = TRUE)%>%
+  save_kable(paste(modelname_ici, "hawaii_ici_confuseMatrix.png", sep="_"), zoom = 2)
+
+```
+
+Proximity Plot
+
+```{r, proximity plot, include=TRUE}
+png(paste(modelname, "hawaii_proximity.png", sep="_"), width = 20, height = 20, units = 'cm', res = 300)
+hawaii_proximityPlot <- plotProximity(banter_model_RF)
+dev.off()
+hawaii_proximityPlot <- plotProximity(banter_model_RF)
+
+png(paste(modelname_ici, "hawaii_proximity.png", sep="_"), width = 20, height = 20, units = 'cm', res = 300)
+ici_hawaii_proximityPlot <- plotProximity(banter_model_ici_RF)
+dev.off()
+ici_hawaii_proximityPlot <- plotProximity(banter_model_ici_RF)
+```
+
+Importance Heatmap
+
+```{r, importance heat map, include=TRUE}
+png(paste(modelname, "hawaii_importance.png", sep="_"), width = 30, height = 25, units = 'cm', res = 300)
+plotImportance(banter_model_RF, plot.type="heatmap")
+dev.off()
+hawaii_importance <- plotImportance(banter_model_RF, plot.type="heatmap")
+
+png(paste(modelname_ici, "hawaii_importance.png", sep="_"), width = 30, height = 25, units = 'cm', res = 300)
+plotImportance(banter_model_ici_RF, plot.type="heatmap")
+dev.off()
+ici_hawaii_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
+```
+
+PlotVotes
+
+```{r, plot votes, include=TRUE}
+png(paste(modelname, "hawaii_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_RF)
+dev.off()
+hawaii_votes <- plotVotes(banter_model_RF)
+
+png(paste(modelname_ici, "hawaii_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_ici_RF)
+dev.off()
+ici_hawaii_votes <- plotVotes(banter_model_ici_RF)
 ```
 
 Class Priors (Expected Error Rate)
@@ -223,33 +287,6 @@ Plot Error Trace for Banter Model
 
 ```{r, model error trace, include=TRUE}
 plot(banter_model_RF)
-```
-
-PlotVotes
-
-```{r, plot votes, include=TRUE}
-png("hawaii_votes.png", width = 20, height = 20, units = 'cm',  res = 300)
-plotVotes(banter_model_RF)
-dev.off()
-plotVotes(banter_model_RF)
-```
-
-Importance Heatmap
-
-```{r, importance heat map, include=TRUE}
-png("hawaii_importance.png", width = 30, height = 25, units = 'cm',  res = 300)
-plotImportance(banter_model_RF, plot.type="heatmap")
-dev.off()
-plotImportance(banter_model_RF, plot.type="heatmap")
-```
-
-Proximity Plot
-
-```{r, proximity plot, include=TRUE}
-png("hawaii_proximity.png", width = 20, height = 20, units = 'cm',  res = 300)
-hawaii_proximityPlot <- plotProximity(banter_model_RF)
-dev.off()
-hawaii_proximityPlot <- plotProximity(banter_model_RF)
 ```
 
 Plot Predicted Probabilities
