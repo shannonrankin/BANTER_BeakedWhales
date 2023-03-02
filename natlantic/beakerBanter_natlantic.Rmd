@@ -116,6 +116,9 @@ saveRDS(banter_data, file='natlantic_banter_data.rds')
 
 banter_data_ici <- export_banter(data, dropSpecies = 'unid', training=TRUE)
 saveRDS(banter_data_ici, file='natlantic_banter_data_ici.rds')
+
+#save update of Acoustic Study
+saveRDS(data, 'natlantic_study.rds')
 ```
 
 ## Build a BANTER Classification Model

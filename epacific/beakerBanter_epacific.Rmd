@@ -1,0 +1,355 @@
+---
+title: "BANTER for Beaked Whales: EPacific (CCES survey)"
+author: "Shannon Rankin"
+date: "2023-03-01"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# When this rmarkdown file is knit:
+# FALSE means it will used saved .rds files instead of re-processing
+# TRUE will run everything from scratch - this will take a long time
+freshRun <- FALSE
+```
+
+## PAMpal Data Processing
+
+Start by loading the required packages
+
+```{r, load packages, message=FALSE}
+library(PAMpal)
+library(banter)
+library(rfPermute)
+library(kableExtra)
+library(here)
+here()
+```
+
+1.  **Set up our PPS** (PAMPal Settings Object) for the EPacific dataset
+
+```{r, pampal settings, eval=freshRun}
+pps <- PAMpalSettings(db='Databases/', 
+                      binaries = 'Binaries/',
+                      sr_hz='auto', 
+                      winLen_sec=.0025, 
+                      filterfrom_khz=10, 
+                      filterto_khz=NULL)
+```
+
+2.  **Process data** and save to file to eliminate repeated processing.
+
+[If]{.underline} you have already run the processing code, ensure you
+have set 'freshRun = FALSE' at top of this document to read in the
+existing .rds file for downstream processing.
+
+```{r, read acoustic study, eval=!freshRun}
+data <- readRDS('epacific_study.rds')
+# Double check warning messages
+print(getWarnings(data)$message)
+```
+
+[If]{.underline} this is the [initial processing]{.underline}, ensure
+you have set 'freshRun = TRUE' at top of this document to process and
+save data. This will take some time to run.
+
+```{r, process detections, eval=freshRun}
+data <- processPgDetections(pps, mode='db', id='epacific_bw')
+saveRDS(data, 'epacific_study.rds')
+# Double check warning messages
+print(getWarnings(data)$message)
+```
+
+
+3.  **Add GPS data**: Add GPS data from PAMGuard table
+
+    ``` {r, add GPS}
+    addGps(data)
+    getWarnings(data)
+    ```
+    
+4.  **Assign species identity** according to original PAMguard labels,
+    then relabel for consistency across projects.
+
+```{r, assign species ID}
+data <- setSpecies(data, 'pamguard')
+reSpecies <- readRDS('species.rds')
+print(reSpecies)
+data <- setSpecies(data, 'reassign', value=reSpecies)
+```
+
+5.  **Filter out unwanted data**: (1) subset and rename species for
+    BANTER model and (2) filter to retain only Channel 1.
+
+```{r, filter unwanted data}
+goodSpecies<- c("ZC", "MS", "BB", "BW", "BW37V", "BW43", "possBW", "BWC")
+data <- filter(data, species %in% goodSpecies)
+data <- setSpecies(data, method='reassign',
+                   value=data.frame(old=c('ZC', 'MS', 'BB', 'BWC'), new=c("Cuviers", "Stejnegers", "Bairds", "CrossSeamount")))
+data_ch1only <- filter(data, Channel == '1')
+```
+
+6. **Calculate Inter-Click Interval** (ICI).
+
+```{r, calculate ICI}
+data_ch1only <- calculateICI(data_ch1only, time='peakTime')
+```
+
+7. **Export Event Wav Files** Wav files for events will be exported to a local drive, and then uploaded to Figshare.
+
+``` {r, export events wav, eval=freshRun}
+addRecordings (data_ch1only, log = TRUE )
+
+wavDir <- "./ccesEventWav" #identify directory to write clips to
+writeEventClips(data_ch1only, buffer = 5, mode = 'event', useSample = TRUE, folder = wavDir)
+#Once this is finished, this data needs to be uploaded to a project in Figshare. Obtain the article ID and post below in annomate section
+
+```
+
+8. **Export to Annomate** Export annotation information to a csv for upload to Ann-O-Mate.
+**NOTE** DO NOT SAVE THIS CODE CHUNK PUBLICLY-- 
+
+```{r, export to annomate, include=TRUE, eval=freshRun}
+#First, run:
+unique(species(data)) #to see unique species and order in which they are named
+#Then update line 119 to include full species names in order in which they occur
+specMap <- data.frame(
+    old = unique(species(data)),
+    new = NA)
+specMap$new <- c('Possible Beaked Whale', 'Ziphius cavirostris', 'Mesoplodon stejnegeri', 
+                 'BW39V', 'Unidentified Beaked Whale', 'Berardius bairdii', 'BW43')
+anno <- prepAnnotation(data, specMap = specMap, mode='event',
+                       # following args are optional, fill in
+                       # any that will be the same for all entries
+                       source = 'figshare.com',
+                       contact = 'shannon.rankin@noaa.gov')
+#Export Annomate file, does this info save to acoustic study?
+
+# to get figshare data you will need the article id and your personal token
+# i recommend storing your token in an external file instead of typing it in here
+# also DO NOT commit this file to any repository
+figToken <- yaml::read_yaml('secrets.yaml')$fig_token
+figId <- 13393360
+figshareData <- getFigshareInfo(figToken, figId)
+
+anno <- matchRecordingUrl(anno, figshareData)
+# will give you warnings and messages about missing fields
+checkAnnotation(anno)
+# if you need to fix any manually, write to csv then read back in
+annoFile <- 'AnnomateExport.csv'
+write.csv(anno, file=annoFile, row.names = FALSE)
+# go fix stuff
+anno <- read.csv(annoFile, stringsAsFactors = FALSE)
+# recheck to see if all seems fine
+checkAnnotation(anno)
+# add to acoustic study for storage
+data <- addAnnotation(data, anno)
+# this creates CSV ready for figshare, will also repeat messages from the check
+export_annomate(data, file=annoFile)
+
+```
+
+
+9. Export data for BANTER (and drop species codes that will not be used
+    for training). We will create two datasets: one with ICI and one
+    without ICI, and save these for import into 
+
+```{r, banter export, eval=freshRun}
+banter_data <- export_banter(data_ch1only, dropSpecies = c('BW', 'possBW'), 
+                         dropVars = c('All_ici'), training=TRUE)
+saveRDS(banter_data, file='epacific_banter_data.rds')
+
+banter_data_ici <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), training=TRUE)
+saveRDS(banter_data_ici, file='epacific_banter_data_ici.rds')
+
+#save update of Acoustic Study
+saveRDS(data_ch1only, 'epacific_study.rds')
+saveRDS(data, 'epacificALL_study.rds')
+```
+
+## Build a BANTER Classification Model
+
+### *Simple Model*
+
+Load data, initialize a BANTER model, and create an initial BANTER
+detector model (stage 1).
+
+```{r, read banter model, include=FALSE, eval=!freshRun}
+banter_model <- readRDS('epacific_banter_model_t1e4s3_t1e4s4.rds')
+```
+
+```{r, banter detector model, eval=freshRun}
+banter_model <- initBanterModel(banter_data$events)
+banter_model <- addBanterDetector(banter_model, banter_data$detectors, ntree=1e4, sampsize=3, importance = TRUE)
+```
+
+Check for stability (are more trees needed?) before moving on
+
+```{r, banter detector model stability, eval=freshRun}
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 1:3))
+plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 4:6))
+summary(banter_model)
+```
+
+Run BANTER Event Model (stage 2)
+
+```{r, banter event model, eval=freshRun}
+banter_model <- runBanterModel(banter_model, ntree=1e4, sampsize=4)
+summary(banter_model)
+```
+
+Check for stability (are more trees needed?). If acceptable, save model
+with tree/sampsize info in the filename.
+
+```{r,save banter model, eval=freshRun}
+saveRDS(banter_model, 'epacific_banter_model_t1e4s3_t1e4s4.rds')
+```
+
+### *ICI Model*
+
+Load data (if previously run)
+
+```{r, read banter ici model, include=FALSE, eval=!freshRun}
+banter_model_ici <- readRDS('epacific_banter_model_ici_t1e4s3_t1e4s4.rds')
+```
+
+Fresh Run: Initialize, Run & Evaluate Detector Model
+
+```{r, banter ici detector model, eval=freshRun}
+banter_model_ici <- initBanterModel(banter_data_ici$events)
+banter_model_ici <- addBanterDetector(banter_model_ici, banter_data_ici$detectors, ntree=1e4, sampsize=3, importance = TRUE)
+plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 1:3))
+plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 4:6))
+summary(banter_model_ici)
+```
+
+Run Event Model
+
+```{r, banter ici event model, eval=freshRun}
+banter_model_ici <- runBanterModel(banter_model_ici, ntree=1e4, sampsize=4)
+summary(banter_model_ici)
+```
+
+Save BANTER model
+
+```{r, save banter ici model, eval=freshRun}
+saveRDS(banter_model_ici, 'epacific_banter_model_ici_t1e4s3_t1e4s4.rds')
+```
+
+## BANTER Analytics
+
+There are a number of visualizations/data products that allow us to
+visualize our BANTER classifier; most use the rfPermute package (see
+[BANTER
+Guidelines](https://taikisan21.github.io/PAMpal/banterGuide.html) for
+more information. First, identify the model you would like to examine
+(comment out the model you [do not]{.underline} want to examine).
+
+```{r, identify model}
+model <- banter_model
+modelname <- "banter_model"
+
+model_ici <- banter_model_ici
+modelname_ici <- "banter_model_ici"
+```
+
+Extract the Random Forest model object from our BANTER model for
+analysis.
+
+```{r, extract RF model}
+banter_model_RF <- getBanterModel(model)
+banter_model_ici_RF <- getBanterModel(model_ici)
+```
+
+Confusion Matrix
+
+```{r, confusion matrix, include=TRUE}
+epacific_confuseMatrix <- rfPermute::confusionMatrix(banter_model_RF)
+epacific_confuseMatrix <- kable(epacific_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(6, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(4,hline_after = TRUE)%>%
+  row_spec(6, bold = TRUE)%>%
+  save_kable(paste(modelname, "epacific_confuseMatrix.png", sep="_"), zoom = 2)
+
+epacific_ici_confuseMatrix <- rfPermute::confusionMatrix(banter_model_ici_RF)
+epacific_ici_confuseMatrix <- kable(epacific_ici_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(6, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(4,hline_after = TRUE)%>%
+  row_spec(6, bold = TRUE)%>%
+  save_kable(paste(modelname_ici, "epacific_ici_confuseMatrix.png", sep="_"), zoom = 2)
+```
+
+Proximity Plot
+
+```{r, proximity plot, include=TRUE}
+png(paste(modelname, "epacific_proximity.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+epacific_proximityPlot <- plotProximity(banter_model_RF)
+dev.off()
+epacific_proximityPlot <- plotProximity(banter_model_RF)
+
+png(paste(modelname_ici, "epacific_proximity.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+ici_epacific_proximityPlot <- plotProximity(banter_model_ici_RF)
+dev.off()
+ici_epacific_proximityPlot <- plotProximity(banter_model_ici_RF)
+
+
+```
+
+Importance Heatmap
+
+```{r, importance heat map, include=TRUE}
+png(paste(modelname, "epacific_importance.png", sep="_"), width = 30, height = 25, units = 'cm',  res = 300)
+plotImportance(banter_model_RF, plot.type="heatmap")
+dev.off()
+epacific_importance <- plotImportance(banter_model_RF, plot.type="heatmap")
+
+png(paste(modelname_ici, "epacific_importance.png", sep="_"), width = 30, height = 25, units = 'cm',  res = 300)
+plotImportance(banter_model_ici_RF, plot.type="heatmap")
+dev.off()
+ici_epacific_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
+```
+
+PlotVotes
+
+```{r, plot votes, include=TRUE}
+png(paste(modelname, "epacific_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_RF)
+dev.off()
+epacific_votes <- plotVotes(banter_model_RF)
+
+png(paste(modelname_ici, "epacific_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_ici_RF)
+dev.off()
+ici_epacific_votes <- plotVotes(banter_model_ici_RF)
+```
+
+Class Priors (Expected Error Rate)
+
+```{r, class priors, include=TRUE}
+epacific_priors <- classPriors(banter_model_RF, NULL)
+```
+
+Plot Confusion Matrix Heat Map
+
+```{r, confusion matrix heat map, include=TRUE}
+plotConfMat(banter_model_RF, title="ConfusionMatrix", plot=TRUE)
+```
+
+Plot Error Trace for Banter Model
+
+```{r, model error trace, include=TRUE}
+plot(banter_model_RF)
+```
+
+Plot Predicted Probabilities
+
+```{r, predicted probabilities, include=TRUE}
+plotPredictedProbs(banter_model_RF, bins=30, plot=TRUE)
+```

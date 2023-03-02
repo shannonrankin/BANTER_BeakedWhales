@@ -120,16 +120,20 @@ format:
       model: 1p
       cite-style: authoryear
 ---
+
 ```{r, hide=TRUE}
 library(tidyverse)
+library(PAMpal)
 library(knitr)
 library(here)
+here
 ```
+
 # Introduction
 
 Passive acoustic monitoring (PAM) from has proven to be a valuable tool for studying populations of marine mammals [@parijs2009]; however, the value of these studies depends on our ability to identify the sources of the sounds we are monitoring. Historically, experienced acousticians manually identify stereotyped sounds that could be reliably attributed to a given species, based on their spectral or temporal characteristics [@baumann-pickering2013]; [@bittle2013]; [@rankin2005]; [@soldevilla2008]. The dramatic increase in recordings make it impossible for experienced acousticians to manually annotate all data, and there has been an increasing need for the development of automated classification routines that can provide accurate determinations of the species responsible for the sounds.
 
-Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods ([@macleod2018]). However, beaked whales make stereotyped echolocation clicks that have temporal and spatial characteristics that can be used to differentiate species [@baumann-pickering2013a]. Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species [@barlow2022]; [@baumann-pickering2014]; [@simonis2020]. Unfortunately, manual classification of beaked whale echolocation clicks requires analysis by trained observers using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serve to improve the efficiency and decrease the cost of analyzing large datasets.
+Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods [@macleod2018]. However, beaked whales make stereotyped echolocation clicks that have temporal and spatial characteristics that can be used to differentiate species [@baumann-pickering2013a]. Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species [@barlow2022]; [@baumann-pickering2014]; [@simonis2020]. Unfortunately, manual classification of beaked whale echolocation clicks requires analysis by trained observers using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serve to improve the efficiency and decrease the cost of analyzing large datasets.
 
 BANTER is a supervised machine learning acoustic event classifier originally developed for classifying dolphin schools from acoustic recordings [@rankin2017]. This hierarchical random forest event classifier relies on an initial call classifier (in the dolphin case study, this included one each for whistles, echolocation clicks, and burst pulses) followed by an event classifier. The event classifier considers the probability of assignment to species for each call in the call classifier, along with any event-level characteristics (such as call rate). BANTER is very flexible and can accommodate any number of measures from any number of detectors. While BANTER relies on multiple call types, relatively minor changes to a call detector could yield different detector results [@rankin2017a]. In this case, settings for a whistle & moan detector were modified to improve performance at detecting burst pulses. This approach of applying multiple call detectors (of the same type but with different settings) suggests that perhaps BANTER could be used on species that only produce one call type (or where only one call type was analyzed), as long as the settings of the automated call detector were modified such that the overall number of detections was different. This approach was successfully applied to classified echolocation clicks for narwhal and belugas [@zahn2021]. For species who primarily (or exclusively) produce echolocation clicks, BANTER may serve as an option for automated machine learning classification.
 
@@ -169,6 +173,13 @@ Four study areas (NAtlantic, SAtlantic, Hawaii, EPacific) were analyzed for this
 
 ## NAtlantic
 
+```{r, hide = TRUE}
+setwd("..")
+natlanticData<-readRDS("natlantic/natlantic_study.rds")
+#Note: Species IDs not saved. Need to rerun? Not sure whats up. 
+
+```
+
 Species encountered in the NAtlantic dataset include Cuvier's beaked whales (n=70), Sowerby's beaked whales (n=5), True's beaked whales (n=65), and Gervais' beaked whales (n=3). BANTER classification trials included (1) echolocation clicks (EC), and (2) echolocation clicks and ICI (EC_ICI).
 
 For the NAtlantic dataset, the most accurate model considered the echolocation clicks and the ICI for an event (EC_ICI, Detector Model: sampsize = 4, ntrees = 30,000; BANTER Model: sampsize = 4, trees=300,000) and provided an overall correct classification rate of 100% for all four species (Fig. 1). There were insufficient samples of Gervais' beaked whales to include in the NAtlantic model (n=2). All classification results were greater than the expected error rate (Prior in Fig. 1a). Results from the EC model are presented here; results from the EC_ICI model can be found in supplementary materials (Supplement Fig. 1).
@@ -181,6 +192,11 @@ The strength of the classifications by species can be seen in the plot votes (Fi
 
 ## SAtlantic
 
+```{r, hide = TRUE}
+setwd("..")
+satlanticData<-readRDS("satlantic/satlantic_study.rds")
+```
+
 Species encountered in the SAtlantic study dataset include Blainsville's beaked whales (n=35), Cuvier's beaked whales (n=66), Gervais' beaked whales (n=45), Sowerby's beaked whales (n=2), and True's beaked whales (n-12). BANTER classification trials included (1) echolocation clicks (EC), and (2) echolocation clicks and ICI (EC_ICI).
 
 For the SAtlantic dataset, the most accurate model considered the echolocation clicks and the ICI for an event (Detector Model: sampsize = 2, ntrees = 30,000; BANTER Model: sampsize = 1, ntrees = 300,000) and provided an overall correct classification rate of 86.9% for all four species. The sample sizes for the BANTER model was kept low (sampsize = 1) to retain Sowerby's beaked whale, which had a sample size of 2. Analysis with a larger sample size resulted in improved classification results for Cuvier's beaked whale (see Supplement Fig. 3 for EC_ICI_ALT), but resulted in the loss of Sowerby's in the final model. Classification scores ranged from a low of 74.2% (Cuvier's beaked whale) to 100% (Sowerby's and True's beaked whale, Fig. 2); all classification results were greater than the expected error rate (Prior in Fig. 2a). Results from the EC_ICI model are presented here; results from the EC model can be found in supplementary materials (Supplement Fig. 2).
@@ -190,6 +206,7 @@ Figure 2. BANTER classification results from the SAtlantic dataset. Confusion ma
 For SAtlantic, the proximity plot (Fig. 2b) shows that True's beaked whales are differentiated from the other species based solely on the two most important features. The importance heat map (Fig. 2c) shows that Cuvier's, Gervais' and Sowerby's beaked whales rely on a number of predictors that are lower in importance and there is likely greater distinction between these species than is represented by the proximity plot (Fig. 2b). The plot votes (Fig. 2d) shows a moderate number of trees in the forest were misclassified and these misclassifications included all species in the model.
 
 ## Hawaii
+
 The Hawaii dataset consisted of 13 drifting buoys deployed within the main Hawaiian Islands (Yano et al. 2018); species included Longman's beaked whale (n=121), Blainsville's beaked whale (n=518), Cross Seamount beaked whale (n=84) and Cuvier's beaked whale (n=201). BANTER classification trials included (1) echolocation clicks (EC), and (2) echolocation clicks and ICI (EC_ICI).
 
 The most accurate model considered the echolocation clicks only (Detector Model: sampsize = 10, ntrees = 5,000; BANTER model: sampsize = 4, ntree = 10,000) and provided an overall correct classification rate of 91.8% for all four species. Classification scores ranged from a low of 84.5% (Cross Seamount Beaked Whale) to 97.5% (Longman's beaked whale, Fig. 3).  All classification results were greater than the expected error rate (Prior in Fig. 3a). Results from the EC model are presented here; results from EC_ICI model can be found in supplementary materials (Supplement Fig. 4).

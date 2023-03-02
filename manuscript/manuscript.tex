@@ -215,7 +215,7 @@ cryptic echolocating species}
 \author{Shannon Rankin \and Taiki Sakai \and Frederick Archer \and Jay
 Barlow \and Danielle Cholewiak \and Annamaria DeAngelis \and Jennifer L.
 K. McCullough \and Erin Oleson \and Melissa Soldevilla}
-\date{2/6/23}
+\date{2/7/23}
 
 \begin{document}
 \maketitle
@@ -238,7 +238,7 @@ automated detectors. These methods provide a highly automated approach
 to acoustic detection and classification using open source methods that
 can be readily adopted for species and geographic regions.
 \end{abstract}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, frame hidden, sharp corners, interior hidden, enhanced, borderline west={3pt}{0pt}{shadecolor}, boxrule=0pt]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[boxrule=0pt, interior hidden, borderline west={3pt}{0pt}{shadecolor}, frame hidden, breakable, enhanced, sharp corners]}{\end{tcolorbox}}\fi
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -272,13 +272,13 @@ here() starts at C:/Users/shannon.rankin/Documents/GitHub/BANTER_BeakedWhales
 \section{Introduction}\label{introduction}}
 
 Passive acoustic monitoring (PAM) from has proven to be a valuable tool
-for studying populations of marine mammals ((Parijs et al. 2009));
+for studying populations of marine mammals (Parijs et al. 2009);
 however, the value of these studies depends on our ability to identify
 the sources of the sounds we are monitoring. Historically, experienced
 acousticians manually identify stereotyped sounds that could be reliably
 attributed to a given species, based on their spectral or temporal
-characteristics ((Baumann-Pickering et al. 2013a); (Bittle and Duncan
-2013); (Rankin and Barlow 2005); (Soldevilla et al. 2008)). The dramatic
+characteristics (Baumann-Pickering et al. 2013a); (Bittle and Duncan
+2013); (Rankin and Barlow 2005); (Soldevilla et al. 2008). The dramatic
 increase in recordings make it impossible for experienced acousticians
 to manually annotate all data, and there has been an increasing need for
 the development of automated classification routines that can provide
@@ -287,13 +287,13 @@ accurate determinations of the species responsible for the sounds.
 Beaked whales are deep diving marine mammals found in offshore waters;
 their long dive intervals and cryptic surfacing behavior make them
 difficult to study using typical shipboard visual observation methods
-((MacLeod 2018)). However, beaked whales make stereotyped echolocation
+(MacLeod 2018). However, beaked whales make stereotyped echolocation
 clicks that have temporal and spatial characteristics that can be used
-to differentiate species ((Baumann-Pickering et al. 2013b)). Detection
-of beaked whale signals in large datasets is greatly expanding our
+to differentiate species (Baumann-Pickering et al. 2013b). Detection of
+beaked whale signals in large datasets is greatly expanding our
 understanding of their population structure and the potential impact of
-human activities on these species ((Barlow et al. 2022);
-(Baumann-Pickering et al. 2014); (Simonis et al. 2020)). Unfortunately,
+human activities on these species (Barlow et al. 2022);
+(Baumann-Pickering et al. 2014); (Simonis et al. 2020). Unfortunately,
 manual classification of beaked whale echolocation clicks requires
 analysis by trained observers using a number of visual aids to examine
 the call characteristics. Development of automated classification
@@ -302,27 +302,27 @@ cost of analyzing large datasets.
 
 BANTER is a supervised machine learning acoustic event classifier
 originally developed for classifying dolphin schools from acoustic
-recordings ((Rankin et al. 2017a)). This hierarchical random forest
-event classifier relies on an initial call classifier (in the dolphin
-case study, this included one each for whistles, echolocation clicks,
-and burst pulses) followed by an event classifier. The event classifier
+recordings (Rankin et al. 2017a). This hierarchical random forest event
+classifier relies on an initial call classifier (in the dolphin case
+study, this included one each for whistles, echolocation clicks, and
+burst pulses) followed by an event classifier. The event classifier
 considers the probability of assignment to species for each call in the
 call classifier, along with any event-level characteristics (such as
 call rate). BANTER is very flexible and can accommodate any number of
 measures from any number of detectors. While BANTER relies on multiple
 call types, relatively minor changes to a call detector could yield
-different detector results ((Rankin et al. 2017b)). In this case,
-settings for a whistle \& moan detector were modified to improve
-performance at detecting burst pulses. This approach of applying
-multiple call detectors (of the same type but with different settings)
-suggests that perhaps BANTER could be used on species that only produce
-one call type (or where only one call type was analyzed), as long as the
-settings of the automated call detector were modified such that the
-overall number of detections was different. This approach was
-successfully applied to classified echolocation clicks for narwhal and
-belugas ((Zahn et al. 2021)). For species who primarily (or exclusively)
-produce echolocation clicks, BANTER may serve as an option for automated
-machine learning classification.
+different detector results (Rankin et al. 2017b). In this case, settings
+for a whistle \& moan detector were modified to improve performance at
+detecting burst pulses. This approach of applying multiple call
+detectors (of the same type but with different settings) suggests that
+perhaps BANTER could be used on species that only produce one call type
+(or where only one call type was analyzed), as long as the settings of
+the automated call detector were modified such that the overall number
+of detections was different. This approach was successfully applied to
+classified echolocation clicks for narwhal and belugas (Zahn et al.
+2021). For species who primarily (or exclusively) produce echolocation
+clicks, BANTER may serve as an option for automated machine learning
+classification.
 
 Here we applied BANTER acoustic classification to beaked whale
 detections from four large acoustic datasets off the US East Coast,
@@ -376,7 +376,7 @@ detailed information).
 Recordings from the Eastern North Pacific Ocean off the U.S. west coast
 (EPacific) were collected using drifting acoustic recorders during the
 2016 PASCAL (Passive Acoustic Survey of Cetacean Abundance Levels)
-survey ((J. Keating et al. 2018a)). Buoys were deployed at a number of
+survey (J. Keating et al. 2018a). Buoys were deployed at a number of
 stations in the California Current, including pre-determined locations
 (for abundance estimation studies) and in close proximity to seamounts
 (Ad Hoc Seamount Experiment). Two types of drifting recorders were
@@ -387,8 +387,8 @@ and recorded 2 minutes out of a variable `off' time; recordings from the
 Seamount Experiment were continuous. Soundtrap recorders were sampled at
 288 kHz and the SM3M recorders were recorded at 256 sample rate (with
 some sampling at 96 kHz for ocean noise measurements). Individual buoys
-were deployed for 11-23 days (see (J. Keating et al. 2018b) for more
-detailed information).
+were deployed for 11-23 days (see {[}J. Keating et al. (2018b){]} for
+more detailed information).
 
 \hypertarget{acoustic-data-analysis}{%
 \subsection{Acoustic Data Analysis}\label{acoustic-data-analysis}}
@@ -422,7 +422,7 @@ arrays were further subdivided into click trains based on identification
 of consecutive clicks along the same bearing angle in the bearing time
 plot (see (DeAngelis et al. 2018b)). Data were saved within the PAMGuard
 database and binaries for downstream processing using PAMpal package
-((Sakai 2021)) in R programming language ((R Core Team 2022)).
+(Sakai 2021) in R programming language (R Core Team 2022).
 
 Standard click calculations were measured from echolocation clicks using
 default values in PAMpal. For EPacific data, any events \textgreater{} 2
@@ -445,7 +445,7 @@ event (EC); and some trials included the mode of the ICI for each event
 Classification}\label{banter-acoustic-classification}}
 
 BANTER models was created for each trial using the BANTER package in R
-programming language ((Archer 2022a)). Standard click calculations were
+programming language (Archer 2022a). Standard click calculations were
 used for the BANTER call classifier; event level measures of ICI were
 applied to the BANTER event classifier. A minimum of two events per
 species and complete suite of variables (absence of NAs) were required
@@ -456,11 +456,11 @@ the number of events considered for each trial of the model, and the
 ntree is the number of trees (iterations of the model) run in a given
 model. These values were modified to obtain the best results, with an
 emphasis on lower sample size and higher number of trees for
-computational performance ((Rankin and Archer 2021)).
+computational performance (Rankin and Archer 2021).
 
 The model output include the confusion matrix, and a number of
 visualizations provided by the rfpermute package in R programming
-language ((Archer 2022b)).
+language (Archer 2022b).
 
 \hypertarget{results}{%
 \section{Results}\label{results}}
@@ -474,8 +474,8 @@ beaked whale (McDonald et al., 2009), Gervais' beaked whales
 pacificus}), Sowerby's beaked whales (\emph{Mesoplodon bidens}), True's
 beaked whales (\emph{Mesoplodon mirus}), Stejneger's beaked whale
 (\emph{Mesoplodon stejnegeri}), and unidentified beaked whale `BW43'
-((Baumann-Pickering et al. 2013a)). Analyses were conducted separately
-for the different study areas due to differences in the data collection
+(Baumann-Pickering et al. 2013a). Analyses were conducted separately for
+the different study areas due to differences in the data collection
 methods that precluded combining of datasets. Specific species
 combinations and sample sizes varied by study area.
 
@@ -785,7 +785,7 @@ classification scores.
 Gervais' and True's beaked whales have similar click characteristics
 that make them difficult to differentiate, and require considerable
 expertise to classify manually, using a variety of available visuals and
-metrics ((DeAngelis et al. 2018c)). Our results suggest that BANTER may
+metrics (DeAngelis et al. 2018c). Our results suggest that BANTER may
 serve as an efficient and effective means of classifying and
 differentiating these two species. Despite modest sample sizes, Gervais'
 and True's beaked whales showed high classification scores (95.6\% and

@@ -1,7 +1,7 @@
 ---
 title: 'BANTER for Beaked Whales: South Atlantic'
 author: "Shannon Rankin"
-date: "2023-02-03"
+date: "2023-02-08"
 output: html_document
 editor_options: 
   markdown: 
@@ -75,9 +75,10 @@ print(getWarnings(data)$message)
     for PAMpal.*
 
 ```{r, assign species ID}
-GU1605_BW <- read_excel("GU1605_PG_OfflineEvents_20210809.xlsx", sheet = "AllData")#read in data
+GU1605 <- read_excel("GU1605_PG_OfflineEvents_20210809.xlsx", sheet = "BWonly")#read in data
+GU1605 <- filter(GU1605, !eventType == "BRAN")
 #create formatted event/species dataframe 
-speciesID <- GU1605_BW[c("Id", "Species", "Database")] %>% 
+speciesID <- GU1605[c("Id", "Species", "Database")] %>% 
   mutate("event" = paste(Database, Id, sep=".OE")) %>% 
   rename("species" = "Species") %>% 
   mutate("species" = str_replace_all(species, "'", ""),
@@ -88,7 +89,7 @@ speciesID <- GU1605_BW[c("Id", "Species", "Database")] %>%
 
 #Assign species ID to data
 data <- setSpecies(data, method='manual', value = speciesID)
-#Note: 130 detections are not given species IDs and will be filtered out at a later step.
+#Note: 238 detections are not given species IDs and will be filtered out at a later step.
 ```
 
 4.  **Filter out unwanted data**: Subset and rename species for BANTER
@@ -116,6 +117,9 @@ saveRDS(banter_data, file='satlantic_banter_data.rds')
 
 banter_data_ici <- export_banter(data, dropSpecies = 'unid', training=TRUE)
 saveRDS(banter_data_ici, file='satlantic_banter_data_ici.rds')
+
+#save update of Acoustic Study
+saveRDS(data, 'satlantic_study.rds')
 ```
 
 ## Build a BANTER Classification Model
@@ -126,12 +130,12 @@ saveRDS(banter_data_ici, file='satlantic_banter_data_ici.rds')
     detector model (stage 1).
 
 ```{r, read banter model, include=FALSE, eval=!freshRun}
-banter_model <- readRDS('satlantic_banter_model_t5e3s3_t5e3s4.rds')
+banter_model <- readRDS('satlantic_banter_model_t1e4s2_t1e5s1.rds')
 ```
 
 ```{r, banter detector model, eval=freshRun}
 banter_model <- initBanterModel(banter_data$events)
-banter_model <- addBanterDetector(banter_model, banter_data$detectors, ntree=5e3, sampsize=4, importance = TRUE)
+banter_model <- addBanterDetector(banter_model, banter_data$detectors, ntree=1e4, sampsize=2, importance = TRUE)
 ```
 
 Check for stability (are more trees needed?) before moving on
@@ -145,7 +149,7 @@ summary(banter_model)
 2.  Run BANTER Event Model (stage 2)
 
 ```{r, banter event model}
-banter_model <- runBanterModel(banter_model, ntree=5e3, sampsize=4)
+banter_model <- runBanterModel(banter_model, ntree=1e5, sampsize=1)
 summary(banter_model)
 ```
 
@@ -153,7 +157,7 @@ Check for stability (are more trees needed?). If acceptable, save model
 with tree/sampsize info in the filename.
 
 ```{r,save banter model, eval=freshRun}
-saveRDS(banter_model, 'satlantic_banter_model_t5e3s3_t5e3s4.rds')
+saveRDS(banter_model, 'satlantic_banter_model_t1e4s2_t1e5s1.rds')
 ```
 
 ### *ICI Model*
@@ -162,12 +166,12 @@ saveRDS(banter_model, 'satlantic_banter_model_t5e3s3_t5e3s4.rds')
     detector model (stage 1).
 
 ```{r, read banter ici model, include=FALSE, eval=!freshRun}
-banter_model_ici <- readRDS('satlantic_banter_model_ici_t10e3s2_t10e3s4.rds')
+banter_model_ici <- readRDS('satlantic_banter_model_ici_t1e4s4_t1e5s1.rds')
 ```
 
 ```{r, banter ici detector model, eval=freshRun}
 banter_model_ici <- initBanterModel(banter_data_ici$events)
-banter_model_ici <- addBanterDetector(banter_model_ici, banter_data_ici$detectors, ntree=10e3, sampsize=2, importance = TRUE)
+banter_model_ici <- addBanterDetector(banter_model_ici, banter_data_ici$detectors, ntree=1e4, sampsize=4, importance = TRUE)
 ```
 
 Check for stability to see if we need more trees
@@ -181,7 +185,7 @@ summary(banter_model_ici)
 2.  Run BANTER Event Model (stage 2)
 
 ```{r, banter ici event model}
-banter_model_ici <- runBanterModel(banter_model_ici, ntree=10e3, sampsize=4)
+banter_model_ici <- runBanterModel(banter_model_ici, ntree=1e5, sampsize=1)
 summary(banter_model_ici)
 ```
 
@@ -189,7 +193,7 @@ Check for stability (are more trees needed?). If acceptable, save model
 with tree/sampsize info in the filename.
 
 ```{r, save banter ici model, eval=freshRun}
-saveRDS(banter_model_ici, 'satlantic_banter_model_ici_t10e3s2_t10e3s4.rds')
+saveRDS(banter_model_ici, 'satlantic_banter_model_ici_t1e4s4_t1e5s1.rds')
 ```
 
 ## BANTER Analytics
@@ -242,20 +246,20 @@ satlantic_ici_confuseMatrix <- kable(satlantic_ici_confuseMatrix, align = "c", d
 
 ```
 
-![](banter_model_hawaii_confuseMatrix.png)
+![](banter_model_satlantic_confuseMatrix.png)
 
 Proximity Plot
 
 ```{r, proximity plot, include=TRUE}
 png(paste(modelname, "satlantic_proximity.png", sep="_"), width = 20, height = 20, units = 'cm', res = 300)
-hawaii_proximityPlot <- plotProximity(banter_model_RF)
+satlantic_proximityPlot <- plotProximity(banter_model_RF)
 dev.off()
-hawaii_proximityPlot <- plotProximity(banter_model_RF)
+satlantic_proximityPlot <- plotProximity(banter_model_RF)
 
 png(paste(modelname_ici, "satlantic_proximity.png", sep="_"), width = 20, height = 20, units = 'cm', res = 300)
-ici_hawaii_proximityPlot <- plotProximity(banter_model_ici_RF)
+ici_satlantic_proximityPlot <- plotProximity(banter_model_ici_RF)
 dev.off()
-ici_hawaii_proximityPlot <- plotProximity(banter_model_ici_RF)
+ici_satlantic_proximityPlot <- plotProximity(banter_model_ici_RF)
 ```
 
 Importance Heatmap
@@ -264,12 +268,12 @@ Importance Heatmap
 png(paste(modelname, "satlantic_importance.png", sep="_"), width = 30, height = 25, units = 'cm', res = 300)
 plotImportance(banter_model_RF, plot.type="heatmap")
 dev.off()
-hawaii_importance <- plotImportance(banter_model_RF, plot.type="heatmap")
+satlantic_importance <- plotImportance(banter_model_RF, plot.type="heatmap")
 
 png(paste(modelname_ici, "satlantic_importance.png", sep="_"), width = 30, height = 25, units = 'cm', res = 300)
 plotImportance(banter_model_ici_RF, plot.type="heatmap")
 dev.off()
-ici_hawaii_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
+ici_satlantic_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
 ```
 
 PlotVotes
@@ -278,18 +282,18 @@ PlotVotes
 png(paste(modelname, "satlantic_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
 plotVotes(banter_model_RF)
 dev.off()
-hawaii_votes <- plotVotes(banter_model_RF)
+satlantic_votes <- plotVotes(banter_model_RF)
 
 png(paste(modelname_ici, "satlantic_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
 plotVotes(banter_model_ici_RF)
 dev.off()
-ici_hawaii_votes <- plotVotes(banter_model_ici_RF)
+ici_satlantic_votes <- plotVotes(banter_model_ici_RF)
 ```
 
 Class Priors (Expected Error Rate)
 
 ```{r, class priors, include=TRUE}
-hawaii_priors <- classPriors(banter_model_RF, NULL)
+satlantic_priors <- classPriors(banter_model_RF, NULL)
 ```
 
 Plot Confusion Matrix Heat Map

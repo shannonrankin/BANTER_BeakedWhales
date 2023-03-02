@@ -1,7 +1,7 @@
 ---
 title: "BANTER for Beaked Whales: Hawaii"
 author: "Shannon Rankin"
-date: "2022-02-06"
+date: "2023-02-06"
 output: html_document
 editor_options: 
   markdown: 
@@ -101,6 +101,9 @@ saveRDS(banter_data, file='hawaii_banter_data.rds')
 
 banter_data_ici <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), training=TRUE)
 saveRDS(banter_data_ici, file='hawaii_banter_data_ici.rds')
+
+#save update of Acoustic Study
+saveRDS(data_ch1only, 'hawaii_study.rds')
 ```
 
 ## Build a BANTER Classification Model
