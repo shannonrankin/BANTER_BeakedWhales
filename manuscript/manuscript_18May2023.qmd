@@ -1,0 +1,267 @@
+---
+title: Open-Source machine learning BANTER acoustic classification of a cryptic echolocating species
+author:
+  - name: Shannon Rankin
+    email: shannon.rankin@noaa.gov
+    affiliations: 
+        - id: SWFSC
+          name: Southwest Fisheries Science Center
+          department: Marine Mammal & Turtle Division
+          address: 8901 La Jolla Shores Dr.
+          city: La Jolla
+          state: CA
+          postal-code: 92037
+    attributes:
+        corresponding: true
+    note: This is the first author footnote.
+  - name: Taiki Sakai
+    email: taiki.sakai@noaa.gov
+    affiliations:
+        - id: SWFSC
+          name: Southwest Fisheries Science Center
+          department: Marine Mammal & Turtle Division
+          address: 8901 La Jolla Shores Dr.
+          city: La Jolla
+          state: CA
+          postal-code: 92037
+  - name: Frederick Archer
+    email: eric.archer@noaa.gov
+    affiliations:
+        - id: SWFSC
+          name: Southwest Fisheries Science Center
+          department: Marine Mammal & Turtle Division
+          address: 8901 La Jolla Shores Dr.
+          city: La Jolla
+          state: CA
+          postal-code: 92037
+  - name: Jay Barlow
+    email: jaybarlow33@yahoo.com
+    affilations:
+        - id: SWFSC
+          name: BarlowAGAD
+          department: 
+          address: 
+          city: 
+          state: 
+          postal-code: 
+        - ref: Barlow AGAD
+  - name: Danielle Cholewiak
+    email: danielle.cholewiak@noaa.gov
+    affilations:
+        - id: NEFSC
+          name: Northeast Fisheries Science Center
+          department: 
+          address: 166 Water Street
+          city: Woods Hole
+          state: MA
+          postal-code: 02543
+  - name: Annamaria DeAngelis
+    email: annamaria.deangelis@noaa.gov
+    affilations:
+        - id: NEFSC
+          name: Northeast Fisheries Science Center
+          department: 
+          address: 166 Water Street
+          city: Woods Hole
+          state: MA
+          postal-code: 02543
+  - name: Jennifer L. K. McCullough
+    email: jennifer.mccullough@noaa.gov
+    affilations:
+        - id: PIFSC
+          name: Pacific Islands Fisheries Science Center
+          department: 
+          address: 1845 Wasp Blvd
+          city: Honolulu
+          state: HI
+          postal-code: 96818
+  - name: Erin Oleson
+    email: erin.oleson@noaa.gov
+    affilations:
+        - id: PIFSC
+          name: Pacific Islands Fisheries Science Center
+          department: 
+          address: 1845 Wasp Blvd
+          city: Honolulu
+          state: HI
+          postal-code: 96818
+  - name: Melissa Soldevilla
+    email: melissa.soldevilla@noaa.gov
+    affilations:
+        - id: SEFSC
+          name: Southeast Fisheries Science Center
+          department: 
+          address: 75 Virginia Beach Drive
+          city: Miami
+          state: FL
+          postal-code: 33143
+abstract: |
+  Passive acoustic monitoring is increasingly used for assessing populations of marine mammals; however, analysis of large datasets is limited by our ability to easily classify sounds detected. Classification of beaked whale acoustic events, in particular, require evaluation of multiple lines of evidence by expert analysts. Here we present a highly automated approach to acoustic detection and classification using supervised machine learning and open source software methods. Data from four large scale surveys of beaked whales (North Atlantic, South Atlantic, Hawaii, and Eastern Pacific) were analyzed PAMGuard (acoustic detection), PAMpal (acoustic analysis) and BANTER (hierarchical random forest classifier). Overall correct classification results ranged from 86% for the South Atlantic data to 99% for the North Atlantic. Results for many species could likely be improved with increased sample sizes and consideration of alternative automated detectors. These methods provide a highly automated approach to acoustic detection and classification using open source methods that can be readily adopted for species and geographic regions.
+keywords: 
+  - bioacoustics
+  - machine learning
+  - random forest
+  - species classification
+  - marine mammals
+  - passive acoustic monitoring
+  - beaked whale
+date: last-modified
+bibliography: ../manuscript/bibliography.bib
+link-citations: TRUE
+format:
+  pdf: default
+  elsevier-pdf:
+    keep-tex: true
+    journal:
+      name: Ecological Informatics
+      formatting: preprint
+      model: 1p
+      cite-style: authoryear
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(PAMpal)
+library(knitr)
+library(magick)
+library(here)
+here()
+```
+
+# Introduction
+
+Passive acoustic monitoring (PAM) has proven to be a valuable tool for studying populations of marine mammals [@parijs_management_2009]\]; however, the value of these studies depends on our ability to identify the sources of the sounds we are monitoring. Historically, experienced acousticians manually identify stereotyped sounds that could be reliably attributed to a given species, based on their spectral or temporal characteristics [@baumann-pickering_species-specific_2013]; [@bittle2013]; [@rankin_source_2005]; [@soldevilla_classification_2008]. The dramatic increase in recordings make it impossible for experienced acousticians to manually annotate all data, and there has been an increasing need for the development of automated classification routines that can provide accurate determinations of the species responsible for the sounds.
+
+Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods [@macleod_beaked_2018]. However, beaked whales make stereotyped echolocation clicks that have temporal and spatial characteristics that can be used to differentiate species [@baumann-pickering_spatio-temporal_2014]. Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species [@barlow_acoustic-based_2022]; [@baumann-pickering_spatio-temporal_2014]; [@simonis_passive_2020]. Unfortunately, manual classification of beaked whale echolocation clicks requires analysis by trained observers using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serve to improve the efficiency and decrease the cost of analyzing large datasets.
+
+BANTER is a supervised machine learning acoustic event classifier originally developed for classifying dolphin schools from acoustic recordings [@rankin_acoustic_2017]. This hierarchical random forest event classifier relies on an initial call classifier for each call type (in the dolphin case study, this included one each for whistles, echolocation clicks, and burst pulses) followed by an event classifier. The event classifier considers the probability of assignment to species for each call in the call classifier, along with any event-level characteristics (such as call rate). BANTER is very flexible and can accommodate any number of measures from any number of detectors. While BANTER relies on multiple call types, relatively minor changes to a call detector could yield different detector results [@rankin_acoustic_2017]. In this case, settings for a whistle & moan detector were modified to improve performance at detecting burst pulses. This approach of applying multiple call detectors (of the same type but with different settings) suggests that perhaps BANTER could be used on species that only produce one call type (or where only one call type was analyzed), as long as the settings of the automated call detector were modified such that the overall number of detections was different. This approach was successfully applied to classified echolocation clicks for narwhal and belugas [@zahn2021]. For species who primarily (or exclusively) produce echolocation clicks, BANTER may serve as an option for automated machine learning classification.
+
+Here we applied BANTER acoustic classification to beaked whale detections from four large acoustic datasets including the US East Coast (north and south), Hawaii, the US West Coast. Acoustic data were analyzed by experienced acousticians to determine species identity, and these 'ground truth' classifications served as training data for the supervised BANTER trials. Our goals are to identify an efficient and accurate automated approach to acoustic classification of beaked whales, and to provide a framework for analysis that may serve for other PAM studies.
+
+# Materials and Methods
+
+## Field Data Collection
+
+Passive acoustic data was collected during three surveys conducted by National Oceanographic and Atmospheric Administrations' research operations off the US East Coast, the Hawaiian Islands (Hawaii) and the US West Coast.
+
+Recordings from the western North Atlantic Ocean (U.S. east coast) were collected using towed hydrophone arrays during the 2016 AMAPPS II (Atlantic Marine Assessment Program for Protected Species) survey (cite). AMAPPS II was subdivided into the northern (NAtlantic) and southern (SAtlantic) survey area. The NAtlantic study area ranged from Massachusetts south to New Jersey (HB1603, \[CITE\]) and recordings used in this analysis consisted of a single hydrophone (HTI-96-min, High Tech Inc., Long Beach, MS) recorded at 192 kHz sample rate with a 1 kHz high pass filter (National Instruments USB-6356 A/D card, see [@deangelis_description_2018] for more information). The SAtlantic area ranged from Delaware south to central Florida (GU1605, \[CITE\]) and recordings used in this analysis consisted of a single hydrophone (Reson \[MODEL\], Teledyne Marine, Slangerup, Denmark) recorded 500 kHz sample rate (soundcard) and decimated to 192 kHz with a 1 kHz high pass filter (see \[CITE\] for more information).
+
+Recordings from Hawaii were collected using drifting acoustic recorders during the 2017 HICEAS (Hawaiian Island Cetacean Ecosystem Assessment Survey, [@yano_cetacean_2018]).  Drifting recording buoys were deployed at randomly selected locations within the main Hawaiian Islands. Two types of drifting recorders were included: (1) Soundtrap ST4300 recorders (Ocean Acoustics, Auckland, New Zealand) and (2) Wildlife Acoustics SM3M recorders (Wildlife Acoustics, Maynard, MA). Soundtrap recorders were sampled at 288 kHz with a duty cycle of 2 min on for every 10 minutes. SM3M data were sampled at 256 kHz with continuous recordings. Individual buoys were deployed for 10 to 50 days (see [@yano_cetacean_2018]for more detailed information).
+
+Recordings from the Eastern North Pacific Ocean off the U.S. west coast (EPacific) were collected using drifting acoustic recorders during the 2016 PASCAL (Passive Acoustic Survey of Cetacean Abundance Levels) survey [@keating_passive_2018]. Buoys were deployed at a number of stations in the California Current, including pre-determined locations (for abundance estimation studies) and in close proximity to seamounts (Ad Hoc Seamount Experiment). Two types of drifting recorders were included: (1) Soundtrap ST4300 recorders (Ocean Acoustics, Auckland, New Zealand) and (2) Wildlife Acoustics SM3M recorders (Wildlife Acoustics, Maynard, MA). Recordings from pre-determined locations were duty cycled and recorded 2 minutes out of a variable 'off' time; recordings from the Seamount Experiment were continuous. Soundtrap recorders were sampled at 288 kHz and the SM3M recorders were recorded at 256 sample rate (with some sampling at 96 kHz for ocean noise measurements). Individual buoys were deployed for 11-23 days (see [@keating_passive_2018] for more detailed information).
+
+## Acoustic Data Analysis
+
+All acoustic recordings were analyzed using PAMGuard software (version 2.00.15c) with a suite of generic click classifiers within the Click Detector module (see [@keating_summary_2013]).  Classifier sets were saved such that any click may be classified as more than one click type. The general click classifiers were effectively click detectors, as each implemented a simple spectral band settings (e.g., 2- 15 kHz, 15 -- 30 kHz, 30 -- 50 kHz, 50 -- 80 kHz, and \> 80 kHz). An additional detector/classifier within the 30 -- 50 kHz peak frequency range considered the presence of a frequency sweep that is characteristic of beaked whale pulses (see [@keating_summary_2013]).
+
+Acoustic detection of beaked whale events were then classified to species by experienced acoustic researchers using multiple lines of evidence. If beaked whales were sighted in close proximity to the recording device, the visual confirmation of species identify was used to determine species identity. Otherwise, experienced acousticians followed strict protocol to define species identify based on acoustic characteristics. When the available characteristics were inconclusive, the species was considered an unidentified beaked whale; only acoustic events classified to species were considered for this study. Acoustic researchers with experience in classifying beaked whale echolocation clicks examined the bearing-time display for the click detector module in PAMGuard to assess the species identity of the acoustic event. For NEFSC data, acoustic detections of beaked whales using towed hydrophone arrays were further subdivided into click trains based on identification of consecutive clicks along the same bearing angle in the bearing time plot (see [@deangelis_description_2018]). Data were saved within the PAMGuard database and binaries for downstream processing using PAMpal package [@sakai_pampal_2021] in R programming language [@rcoreteam2022].
+
+Standard click calculations were measured from echolocation clicks using default values in PAMpal. For EPacific data, any events \> 2 minutes were subdivided into 2-minute events to ensure that all events were of equal value (because most of our data was duty cycled into 2-minute blocks). Inter-click interval (ICI) was calculated using the 'calculateICI' function in PAMpal; the mode of the ICI was identified for each beaked whale acoustic event.
+
+Multiple trials were conducted to better understand the value (and potential limitations) of the different suite of measurements. Data subsets for each trial were exported for BANTER classification using the export_banter function in PAMpal. At a minimum, each trial included standard click calculations for all clicks in a beaked whale acoustic event (EC); and some trials included the mode of the ICI for each event (EC_ICI).
+
+## BANTER Acoustic Classification
+
+BANTER models was created for each trial using the BANTER package in R programming language [@archer_banter_2022]. Standard click calculations were used for the BANTER call classifier; event level measures of ICI were applied to the BANTER event classifier. A minimum of two events per species and complete suite of variables (absence of NAs) were required for training and testing of the classification model. The BANTER random forest models contain two parameters, ntree and sampsize, which must be selected to ensure stability of the model. The sample size (sampsize) is the number of events considered for each trial of the model, and the ntree is the number of trees (iterations of the model) run in a given model. These values were modified to obtain the best results, with an emphasis on lower sample size and higher number of trees for computational performance [@rankin_banter_2021].
+
+The model output include the confusion matrix, and a number of visualizations provided by the rfpermute package in R programming language [@archer_rfpermute_2022].
+
+# Results
+
+Four study areas (NAtlantic, SAtlantic, Hawaii, EPacific) were analyzed for this study; species included: Baird's beaked whales (*Berardius bairdii*), Blainsville's beaked whales (*Mesoplodon densirostris*), Cuvier's beaked whales (*Ziphius cavirostris*), Cross Seamount beaked whale (McDonald et al., 2009), Gervais' beaked whales (*Mesoplodon europaeus*), Longman's beaked whale (*Indopacetus pacificus*), Sowerby's beaked whales (*Mesoplodon bidens*), True's beaked whales (*Mesoplodon mirus*), Stejneger's beaked whale (*Mesoplodon stejnegeri*), and unidentified beaked whale 'BW43' [@baumann-pickering_species-specific_2013]. Analyses were conducted separately for the different study areas due to differences in the data collection methods that precluded combining of datasets. Specific species combinations and sample sizes varied by study area.
+
+## NAtlantic
+
+Species encountered in the NAtlantic dataset include Cuvier's beaked whales (n=70), Sowerby's beaked whales (n=5), True's beaked whales (n=65), and Gervais' beaked whales (n=3). BANTER classification trials included (1) echolocation clicks (EC), and (2) echolocation clicks and ICI (EC_ICI).
+
+For the NAtlantic dataset, the most accurate model considered the echolocation clicks and the ICI for an event (EC_ICI, Detector Model: sampsize = 4, ntrees = 30,000; BANTER Model: sampsize = 4, trees=300,000) and provided an overall correct classification rate of 100% for all four species (Fig. 1). There were insufficient samples of Gervais' beaked whales to include in the NAtlantic model (n=2). All classification results were greater than the expected error rate (Prior in Fig. 1a). Results from the EC model are presented here; results from the EC_ICI model can be found in supplementary materials (Supplement Fig. 1).
+
+![BANTER classification results from the NAtlantic dataset (EC). Confusion matrix (a) provides the percent correct classification or each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represent true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of variable importance for each species; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.](../Figures/natlantic_Figure.png){fig-align="center"}
+
+The proximity plot (Fig.1b) provides a view of the distribution of events within the feature space of the two 'most important' dimensions, or predictors. For each event in the plot, the color of the central dot represents the true species identity, and the circle represents the BANTER classification result. The importance heat map (Fig. 1c) shows that the most important features for predicting each species.
+
+The strength of the classifications by species can be seen in the plot votes (Fig. 1d), which show the istribution of the votes for each of the 300,000 trials. For each plot, the events are represented as vertical slices (with plot subdivided along the x-axes according to the event sample size), and the percentage of votes for each species is represented by their color along that vertical slice. In a perfect scenario, all 300,000 trees would have voted for the correct species and therefore the classification would be correct AND the strength of these classifications would be maximized. The plot vote for the NAtlantic dataset show that all species
+
+## SAtlantic
+
+Species encountered in the SAtlantic study dataset include Blainsville's beaked whales (n = 35), Cuvier's beaked whales (n = 66), Gervais' beaked whales (n = 45), Sowerby's beaked whales (n = 2), and True's beaked whales (n = 12). BANTER classification trials included (1) echolocation clicks (EC), and (2) echolocation clicks and ICI (EC_ICI).
+
+For the SAtlantic dataset, the most accurate model considered the echolocation clicks and the ICI for an event (Detector Model: sampsize = 2, ntrees = 30,000; BANTER Model: sampsize = 1, ntrees = 300,000) and provided an overall correct classification rate of 86.9% for all four species. The sample sizes for the BANTER model was kept low (sampsize = 1) to retain Sowerby's beaked whale, which had a sample size of 2. Analysis with a larger sample size resulted in improved classification results for Cuvier's beaked whale (see Supplement Fig. 3 for EC_ICI_ALT), but resulted in the loss of Sowerby's in the final model. Classification scores ranged from a low of 74.2% (Cuvier's beaked whale) to 100% (Sowerby's and True's beaked whale, Fig. 2); all classification results were greater than the expected error rate (Prior in Fig. 2a). Results from the EC_ICI model are presented here; results from the EC model can be found in supplementary materials (Supplement Fig. 2).
+
+![BANTER classification results from the SAtlantic dataset. Confusion matrix provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), priors (expected error rate). Proximity plot (a) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (b) for ranks of variable importance for each species; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (c) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.](../Figures/satlantic_ici_Figure.png){fig-align="center"}
+
+For SAtlantic, the proximity plot (Fig. 2b) shows that True's beaked whales are differentiated from the other species based solely on the two most important features. The importance heat map (Fig. 2c) shows that Cuvier's, Gervais' and Sowerby's beaked whales rely on a number of predictors that are lower in importance and there is likely greater distinction between these species than is represented by the proximity plot (Fig. 2b). The plot votes (Fig. 2d) shows a moderate number of trees in the forest were misclassified and these misclassifications included all species in the model.
+
+## Hawaii
+
+The Hawaii dataset consisted of 13 drifting buoys deployed within the main Hawaiian Islands (Yano et al. 2018); species included Blainsville's beaked whale (n = 521), Cross Seamount beaked whale (n = 76), Cuvier's beaked whale (n = 201), and Longman's beaked whale (n = 122). BANTER classification trials included (1) echolocation clicks (EC), and (2) echolocation clicks and ICI (EC_ICI).
+
+The most accurate model considered the echolocation clicks only (Detector Model: sampsize = 10, ntrees = 5,000; BANTER model: sampsize = 4, ntree = 10,000) and provided an overall correct classification rate of 92.1% for all four species. Classification scores ranged from a low of 86% (Cuvier's Beaked Whale) to 97.5% (Longman's beaked whale, Fig. 3). All classification results were greater than the expected error rate (Prior in Fig. 3a). Results from the EC model are presented here; results from EC_ICI model can be found in supplementary materials (Supplement Fig. 4).
+
+![BANTER classification results from the Hawaii dataset. Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of variable importance for each species; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.](../Figures/hawaii_ici_Figure.png)
+
+There are clear distinctions in the primary features used to classify three of the four species as shown in the Proximity Plot (Fig. 3b) which shows the classification results based on the two most 'important' predictors. Distinctive clusters based on the two most important features can be found for Longman's, Blainsville's, and Cuvier's beaked whales, and there is overlap in the feature space of the clusters for Cuvier's and Cross Seamount beaked whales. This overlap is resolved with different importance features for Cuvier's and Cross Seamount beaked whales as seen in the Importance Heat Map (Fig. 3c), resulting in the low misclassification rates for these species (Fig. 3a confusion matrix). The plot votes graph (Fig. 3d) show strong classification results for Blainsville's, Cross Seamount, and Longman's beaked whales, with lower classification strength for many Cuvier's beaked whale events.
+
+## Eastern Pacific
+
+The EPacific dataset consisted of 25 drifting recording buoys (20 stations plus 5 seamount experiment drifts) deployed off the west coast of the United States ([@simonis_passive_2020]); species included Baird's beaked whale (n = 31), Unidentified Beaked Whale 'BW43' (n = 135), Cross Seamount beaked whale (n = 6), Cuvier's beaked whale (n = 935), Hubbs beaked whale (n = 66) and Stejneger's beaked whale (n = 42). BANTER classification trials included (1) echolocation clicks (EC) and (2) echolocation clicks and ICI (EC_ICI).
+
+The best model considered the echolocation clicks and the ICI values (Detector Model: sampsize = 3, ntrees = 10,000; BANTER model: sampsize = 4, ntree = 10,000) and provided an overall correct classification rate of 91.4% for all six species. Classification scores ranged from a low of 83.3% (Cross Seamount beaked whale) to 96.9% (Hubbs beaked whale, Fig. 4a). All classification results were greater than the expected error rate (Prior in Fig. 4a). Results from the EC_ICI model are presented here; complete results can be found in supplementary materials (Supplement Figs. 5-7).
+
+![BANTER classification results from the EPacific dataset. Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), priors (expected error rate), and . Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of variable importance for each species; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.](../Figures/epacific_ici_Figure.png){fig-align="center"}
+
+There is considerable overlap in the primary features used to classify the Cuvier's, Cross Seamount, and BW43 beaked whales, as shown in the Proximity Plot (Fig. 4b), which shows the classification results based on the two most 'important' predictors. ICI was among the most important classification variable for all species (Fig. 4c heat map). The plot votes (Fig. 4d) show strong classification results for most events of all species except Cross Seamount beaked whale.
+
+# Discussion
+
+The results for the four study areas varied from a low of 86.9% correct classification in the SAtlantic dataset to a high of 100% correct classification in the NAtlantic dataset. All species in all datasets had classifications rates well above those expected by chance; however Cuvier's (SAtlantic, Hawaii), BWC (Hawaii), and Blainsville's beaked whales (Hawaii) had classification rates below 90%. There were insufficient sample sizes of Gervais to include in the NAtlantic dataset.
+
+Several of our datasets included very low sample sizes for some species; however, low sample sizes did not always result in low classification scores. In the Atlantic dataset, Sowerby's beaked whale was consistently correctly classified in both models (NAtlantic and SAtlantic); however, while the plot votes showed very strong classification strength in the NAtlantic, the classification strength (represented by the number of trees that voted for the correct classification) was poor in the SAtlantic study area.This is likely due to both a small sample size of Sowerby's detected in the S. study area (n=2) combined with the small sampsize used in the BANTER model. In general, larger sample sizes should lead to improved overall classification results, and improved strength of these classification results (as identified by plot vote graph).
+
+While some species have distinctive differences in their click characteristics that lead to strong classification despite small sample sizes (e.g. Sowerby's beaked whales in NAtlantic); other species, such as Cuvier's beaked whales, have significant variation in their click measurements.  For species with high variability in the predictor variables and an overlap in the range of these variables with other species, a large sample size is required to describe the true variability of these call measurements. Even with reasonably large sample sizes, the classification may suffer (e.g, SAtlantic Cuvier's beaked whale = 74%). We found by increasing the sampsize in BANTER, we could increase the classification rate for this species in this area to (97%, see Supplement Fig.3); however, this resulted in the loss of Sowerby's beaked whale in the final model. So, an increased sample size in Sowerby's would likely lead to increased classification results for other species in the model.
+
+Previous application of BANTER to dolphin species in the California Current found that large sample sizes could result in strong classification of species where experienced acousticians are unable to differentiate species (long-beaked and short-beaked common dolphins, [@rankin_acoustic_2017]). This suggests that large increases in sample size may improve classification results for Cuvier's beaked whales.
+
+Researchers have noted several 'types' of click characteristics for Cuvier's beaked whales (ADA, pers. comm) which may be related to variability in the propagation environment, different animal behaviors, gender or age classes, or acoustic populations. Future work should examine if these Cuvier's beaked whale events can be clustered in an objective and stable manner; if so, then these can be input into BANTER models as separate types of Cuvier's beaked whales. We recommend caution in this approach- this should only be considered if there is reasonable evidence that these different groups represent authentic cluster. We do not recommend segregation of misclassified subgroups simply to improve classification scores.
+
+Gervais' and True's beaked whales have similar click characteristics that make them difficult to differentiate, and require considerable expertise to classify manually, using a variety of available visuals and metrics [@deangelis_description_2018]. Our results suggest that BANTER may serve as an efficient and effective means of classifying and differentiating these two species. Despite modest sample sizes, Gervais' and True's beaked whales showed high classification scores (95.6% and 100%, respectively). Unfortunately, we were unable to combine the N and S Atlantic datasets (which would increase sample sizes of True's beaked whales) due to differences in hydrophone characteristics that result in differences in call measures. Calibration of signals (to make them comparable) may allow for combining datasets to improve sample sizes.
+
+For the SAtlantic models, ICI was found to be an important predictor for many species \[*talk about the 1 change in sowerby's when the ICI was added- do you think it was because of an error in ICI?*\] . For Hawaii and the EPacific, however, we found that adding ICI into the BANTER classifier did not improve final classification results. The differences here are likely due to different analysis methods for identifying events. Beaked whale events were defined by encounter time for both the Hawaii and EPacific data, which were collected using drifting acoustic recorders where animals could not be localized. The Atlantic data were collected using a towed hydrophone array with localization capabilities. Each event was defined as an individual click train, so ICI for these events more likely represented true ICI, and was found to be more informative. [@baumann-pickering_species-specific_2013] showed an overlap in the ICI between Cuvier's and Blainsville's beaked whales, but a strong difference in ICI between these species and BWC. Likewise, [@baumann-pickering_species-specific_2013] found a difference in ICI between Baird's beaked whales and Cuvier's beaked whales. Subdividing click trains in PAMGuard is time consuming, but alternative options include consideration of the PAMGuard click train detector module in BANTER, or by developing a similar function in R to apply to events. Integration of ICI from individual click trains may serve to improve classification results for some species in Hawaii and EPacific.
+
+Gervais were eliminated from the NAtlantic BANTER model due to low sample size (n=2); results were extremely poor when they were included in the model. Analysis notes indicate uncertainty in manual species classification on one of the two events in this dataset. While small sample size can at times provide good classification scores, as we found in Sowerby's beaked whale in this SAtlantic dataset, they can be devastating if there are inaccuracies in the training data. These two examples of small sample sizes highlights a conflict in preferred protocol. Ideally, (1) all [species]{.underline} would be included in a classification model, so as to better represent the local species diversity, (2) all [events]{.underline} would ideally be included in the classification model, so as to better represent the variability found in the area, and (3) only confident 'ground truth' classifications would be considered in the training model. Unfortunately, in species where identity must be determined based on call characteristics (rather than visual confirmation of species identity in the field), it can sometimes be difficult to confidently determine species identity when calls are highly variable and do not include at least one call that provides high confidence of species identity. In the case of beaked whales, we recommend that training data include a reasonable level of confidence for inclusion. When sample sizes are low, such as in these cases, it may be wise to consider the strength of the classifications when including them for model training (as we have done here). An alternative is to require agreement from multiple analysts, as provided by the EPacific datasets. This concern about accurate labeling of training data is further complicated by the potential existence of species that have not yet been identified. For example, (cite jays new paper) recently discovered what appears to be a new species of beaked whale off Baja California, Mexico; this putative new species may have been detected but misclassified in other datasets (including the EPacific data presented here).
+
+While BANTER provides an efficient and consistent approach to classification, there are significant limitations that must be considered. BANTER is a supervised machine learning tool and requires reliable training data for success. Training data should consist of labels with strong confidence in species identify (ideally determined by agreement from more than one analyst) and sample sizes should be large enough to explain the natural variability in the data. In fact, consideration of the strength of classification scores may help identify cases where the training data were of poor quality, or where there may be evidence to identify different acoustic populations or behavior states.
+
+The workflow presented here provides a highly automated approach to detection of acoustic events (PAMGuard), integration of environmental data (PAMpal) and acoustic event classification (BANTER). These methods significantly reduce manual analysis, provide more consistent classification results with fewer biases, and provide an estimate of classification error.  The greatest improvement to classification results for beaked whales would likely result from improved sample sizes and examination of individual click trains in measuring ICI. Consideration of additional detectors (e.g. matched filter detector, click train detector) or additional environmental variables may further improve classification results. These highly automated methods may allow for analysis of data across large spatial and temporal scales to address large ecological and population level questions.
+
+# Acknowledgements
+
+The authors would like to acknowledge the large number of scientists and shipboard crew who were responsible for data collection during multiple large scale studies. Funding for data collection and analysis were provided by U.S. Navy, Bureau of Ocean Energy Management, and the National Oceanographic and Atmospheric Administration. The manuscript was improved thanks to reviews from XX and XX.
+
+# Figures and tables
+
+@fig-meaningless is generated using an R chunk.
+
+```{r, test}
+#| label: fig-meaningless
+#| fig-cap: A meaningless scatterplot
+#| fig-width: 5
+#| fig-height: 5
+#| fig-align: center
+#| out-width: 50%
+#| echo: false
+#plot(runif(25), runif(25))
+```
+
+# Tables coming from R
+
+Tables can also be generated using R chunks, as shown in @tbl-simple example.
+
+```{r}
+#| label: tbl-simple
+#| tbl-cap: Caption centered above table
+#| echo: true
+knitr::kable(head(mtcars)[,1:4])
+```
+
+# References {.unnumbered}

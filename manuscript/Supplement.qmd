@@ -1,0 +1,158 @@
+---
+title: Supplement for Open-Source machine learning BANTER acoustic classification of a cryptic echolocating species
+author: Shannon Rankin
+date: last-modified
+output: pdf
+---
+
+```{r, load packages, include=FALSE}
+library("easypackages")
+libraries("tidyverse", "knitr", "kableExtra", "magick", "magrittr", "here")
+here()
+```
+
+
+# NAtlantic
+## EC Model
+
+Detector Model:  ntree=1e4, sampsize=3; 
+Event Model: ntree=1e4, sampsize=3
+```{r,  NAtlantic EC Model Figure, echo=FALSE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+natlantic_ec_Figure <-image_append(c(prox, heat, vote))
+natlantic_ec_Figure<- image_append(c(confuse, natlantic_ec_Figure), stack=TRUE)
+print(natlantic_ec_Figure, info=FALSE)
+```
+
+## EC_ICI_ALT Model
+Detector Model:  ntree=1e4, sampsize=5; 
+Event Model: ntree=1e4, sampsize=5
+```{r, NAtlantic EC_ICI_ALT Model Figure,  echo=FALSE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+natlantic_alt_Figure <-image_append(c(prox, heat, vote))
+natlantic_alt_Figure<- image_append(c(confuse, natlantic_alt_Figure), stack=TRUE)
+print(natlantic_alt_Figure, info=FALSE)
+```
+
+# SAtlantic
+## EC Model
+Detector Model:  ntree=1e4, sampsize=2; 
+Event Model: ntree=1e5, sampsize=1
+```{r, SAtlantic EC Model Figure,  echo=FALSE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+satlantic_ec_Figure <-image_append(c(prox, heat, vote))
+satlantic_ec_Figure<- image_append(c(confuse, satlantic_ec_Figure), stack=TRUE)
+print(satlantic_ec_Figure, info=FALSE)
+```
+
+## EC_ICI_ALT Model
+Detector Model:  ntree=1e4, sampsize=4; 
+Event Model: ntree=1e5, sampsize=2
+```{r, SAtlantic EC_ICI_ALT Model Figure,  echo=FALSE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+satlantic_alt_Figure <-image_append(c(prox, heat, vote))
+satlantic_alt_Figure<- image_append(c(confuse, satlantic_alt_Figure), stack=TRUE)
+print(satlantic_alt_Figure, info=FALSE)
+```
+
+
+# Hawaii
+## EC_ICI Model
+Detector Model:  ntree=5e3, sampsize=5; 
+Event Model: ntree=1e4, sampsize=4
+```{r, Hawaii EC_ICI Model Figure,  echo=FALSE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+hawaii_ici_Figure <-image_append(c(prox, heat, vote))
+hawaii_ici_Figure<- image_append(c(confuse, hawaii_ici_Figure), stack=TRUE)
+print(hawaii_ici_Figure, info=FALSE)
+```
+
+# EPacific
+## EC Model
+Detector Model:  ntree=1e4, sampsize=3; 
+Event Model: ntree=1e4, sampsize=4
+
+```{r, EPacific EC Model Figure,  echo=FALSE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+epacific_ec_Figure <-image_append(c(prox, heat, vote))
+epacific_ec_Figure<- image_append(c(confuse, epacific_ec_Figure), stack=TRUE)
+print(epacific_ec_Figure, info=FALSE)
+```

@@ -1,7 +1,7 @@
 ---
 title: "BANTER for Beaked Whales: EPacific (CCES survey)"
 author: "Shannon Rankin"
-date: "2023-03-01"
+date: "2023-05-25"
 output: html_document
 editor_options: 
   markdown: 
@@ -16,16 +16,20 @@ knitr::opts_chunk$set(echo = TRUE)
 freshRun <- FALSE
 ```
 
+###Organizational Instructions Save this file in an R Project that
+includes the following foldering: /Project \|-Database/ \|-Binaries/
+\|-Figures/ \|-epacific \|\_ beakerBanter_epacific.Rmd \|\_
+epacific_banter_data.rds \|\_ epacific_banter_data_ici.rds \|\_
+epacific_banter_model_ec_t1e4s3_t1e4s4.rds \|\_
+epacific_banter_model_ici_t1e4s3_t1e4s4
+
 ## PAMpal Data Processing
 
 Start by loading the required packages
 
 ```{r, load packages, message=FALSE}
-library(PAMpal)
-library(banter)
-library(rfPermute)
-library(kableExtra)
-library(here)
+library("easypackages")
+libraries("PAMpal", "banter", "rfPermute", "kableExtra", "magick", "magrittr", "here")
 here()
 ```
 
@@ -42,16 +46,6 @@ pps <- PAMpalSettings(db='Databases/',
 
 2.  **Process data** and save to file to eliminate repeated processing.
 
-[If]{.underline} you have already run the processing code, ensure you
-have set 'freshRun = FALSE' at top of this document to read in the
-existing .rds file for downstream processing.
-
-```{r, read acoustic study, eval=!freshRun}
-data <- readRDS('epacific_study.rds')
-# Double check warning messages
-print(getWarnings(data)$message)
-```
-
 [If]{.underline} this is the [initial processing]{.underline}, ensure
 you have set 'freshRun = TRUE' at top of this document to process and
 save data. This will take some time to run.
@@ -63,107 +57,105 @@ saveRDS(data, 'epacific_study.rds')
 print(getWarnings(data)$message)
 ```
 
+[If]{.underline} you have already run the processing code, ensure you
+have set 'freshRun = FALSE' at top of this document to read in the
+existing .rds file for downstream processing.
 
-3.  **Add GPS data**: Add GPS data from PAMGuard table
+```{r, read acoustic study, include=FALSE, eval=!freshRun}
+data_ch1only <- readRDS('epacific_study.rds')
+# Double check warning messages
+print(getWarnings(data_ch1only)$message)#Note: Detection >7200sec apart is a sperm whale detection. Anne was informed of the error.
+```
 
-    ``` {r, add GPS}
-    addGps(data)
-    getWarnings(data)
-    ```
-    
-4.  **Assign species identity** according to original PAMguard labels,
+3.  **Assign species identity** according to original PAMguard labels,
     then relabel for consistency across projects.
 
-```{r, assign species ID}
+```{r, assign species ID, eval=freshRun}
 data <- setSpecies(data, 'pamguard')
 reSpecies <- readRDS('species.rds')
 print(reSpecies)
 data <- setSpecies(data, 'reassign', value=reSpecies)
 ```
 
-5.  **Filter out unwanted data**: (1) subset and rename species for
+4.  **Filter out unwanted data**: (1) subset and rename species for
     BANTER model and (2) filter to retain only Channel 1.
 
-```{r, filter unwanted data}
-goodSpecies<- c("ZC", "MS", "BB", "BW", "BW37V", "BW43", "possBW", "BWC")
-data <- filter(data, species %in% goodSpecies)
+```{r, filter unwanted data, eval=freshRun}
 data <- setSpecies(data, method='reassign',
-                   value=data.frame(old=c('ZC', 'MS', 'BB', 'BWC'), new=c("Cuviers", "Stejnegers", "Bairds", "CrossSeamount")))
+                   value=data.frame(old=c('ZC', 'MS', 'BB', 'BWC', 'BW37V'), new=c("Cuviers", "Stejnegers", "Bairds", "CrossSeamount", "Hubbs")))
+goodSpecies<- c("Cuviers", "Stejnegers", "Bairds", "CrossSeamount", "Hubbs", "BW", "BW43", "possBW")
+data <- filter(data, species %in% goodSpecies)
 data_ch1only <- filter(data, Channel == '1')
 ```
 
-6. **Calculate Inter-Click Interval** (ICI).
+5.  **Calculate Inter-Click Interval** (ICI).
 
-```{r, calculate ICI}
+```{r, calculate ICI, eval=freshRun}
 data_ch1only <- calculateICI(data_ch1only, time='peakTime')
 ```
 
-7. **Export Event Wav Files** Wav files for events will be exported to a local drive, and then uploaded to Figshare.
+6.  **Add GPS data**: Add GPS data from PAMGuard table (2 hour
+    threshold), then filter out data without GPS
 
-``` {r, export events wav, eval=freshRun}
-addRecordings (data_ch1only, log = TRUE )
+```{r, add GPS, eval=freshRun}
+data_ch1only <- addGps(data_ch1only, thresh = 7200)#11 events over the threshold
+getWarnings(data_ch1only)
+  
+data_ch1only <- filter(data_ch1only, !is.na(Latitude))#filter out events w/o GPS
+clicks <- getClickData(data_ch1only)
+sum(is.na(clicks$Latitude))
+unique(clicks[is.na(clicks$Latitude), 'eventId'])#confirm there are no remaining events w/o GPS
+```
 
-wavDir <- "./ccesEventWav" #identify directory to write clips to
-writeEventClips(data_ch1only, buffer = 5, mode = 'event', useSample = TRUE, folder = wavDir)
-#Once this is finished, this data needs to be uploaded to a project in Figshare. Obtain the article ID and post below in annomate section
+7. **Add Environmental Data**
+```{r, Add Environmental Data, eval=freshRun}
+#SST
+data_ch1only <- matchEnvData(data_ch1only, nc='jplMURSST41mday', var='sst')
+#Seafloor Depth
+data_ch1only <- matchEnvData(data_ch1only, nc='erdSrtm30plusSeafloorGradient', var='sea_floor_depth')
+#Seafloor Gradient
+data_ch1only <- matchEnvData(data_ch1only, nc='erdSrtm30plusSeafloorGradient', var='magnitude_gradient')
+
 
 ```
 
-8. **Export to Annomate** Export annotation information to a csv for upload to Ann-O-Mate.
-**NOTE** DO NOT SAVE THIS CODE CHUNK PUBLICLY-- 
+7.  **Export Event Wav Files** Wav files for events will be exported to
+    a local drive, and then uploaded to Figshare.
 
-```{r, export to annomate, include=TRUE, eval=freshRun}
-#First, run:
-unique(species(data)) #to see unique species and order in which they are named
-#Then update line 119 to include full species names in order in which they occur
-specMap <- data.frame(
-    old = unique(species(data)),
-    new = NA)
-specMap$new <- c('Possible Beaked Whale', 'Ziphius cavirostris', 'Mesoplodon stejnegeri', 
-                 'BW39V', 'Unidentified Beaked Whale', 'Berardius bairdii', 'BW43')
-anno <- prepAnnotation(data, specMap = specMap, mode='event',
-                       # following args are optional, fill in
-                       # any that will be the same for all entries
-                       source = 'figshare.com',
-                       contact = 'shannon.rankin@noaa.gov')
-#Export Annomate file, does this info save to acoustic study?
+```{r, export events wav, eval=freshRun}
+#This should only be run one time, with access to original wav files. Will be commented out to ensure it is not accidentally run
+#data <- readRDS(here('epacific', 'epacific_study.rds'))
+#Check that all events are <120s
+#checkStudy(data, maxLength = 120)
 
-# to get figshare data you will need the article id and your personal token
-# i recommend storing your token in an external file instead of typing it in here
-# also DO NOT commit this file to any repository
-figToken <- yaml::read_yaml('secrets.yaml')$fig_token
-figId <- 13393360
-figshareData <- getFigshareInfo(figToken, figId)
+#Identify location of all recording files and log files
+#data<- addRecordings (data, log = TRUE )
+#saveRDS(data, 'epacific_study.rds')
 
-anno <- matchRecordingUrl(anno, figshareData)
-# will give you warnings and messages about missing fields
-checkAnnotation(anno)
-# if you need to fix any manually, write to csv then read back in
-annoFile <- 'AnnomateExport.csv'
-write.csv(anno, file=annoFile, row.names = FALSE)
-# go fix stuff
-anno <- read.csv(annoFile, stringsAsFactors = FALSE)
-# recheck to see if all seems fine
-checkAnnotation(anno)
-# add to acoustic study for storage
-data <- addAnnotation(data, anno)
-# this creates CSV ready for figshare, will also repeat messages from the check
-export_annomate(data, file=annoFile)
+#Identify directory to save wav files, and write event Wav Clips
+#wavDir <- here('epacific', 'ccesEventWav')#identify directory to write clips to
+#writeEventClips(data, buffer = 5, mode = 'event', useSample = FALSE, outDir = wavDir)
+#saveRDS(data, 'epacific_study.rds')
 
 ```
 
+8.  **Export to Annomate** Export annotation information to a csv for
+    upload to Ann-O-Mate. Run code in annomate.R, but do not share this code publicly.
 
-9. Export data for BANTER (and drop species codes that will not be used
+9.  Export data for BANTER (and drop species codes that will not be used
     for training). We will create two datasets: one with ICI and one
-    without ICI, and save these for import into 
+    without ICI, and save these for import into
 
 ```{r, banter export, eval=freshRun}
 banter_data <- export_banter(data_ch1only, dropSpecies = c('BW', 'possBW'), 
-                         dropVars = c('All_ici'), training=TRUE)
+                         dropVars = c('All_ici', 'Click_Detector_3_ici', 'sea_floor_depth_mean', 'sst_mean', 'productivity_mean', 'chlorophyll_mean',  'magnitude_gradient_mean'), training=TRUE)
 saveRDS(banter_data, file='epacific_banter_data.rds')
 
-banter_data_ici <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), training=TRUE)
+banter_data_ici <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), dropVars = c('sea_floor_depth_mean', 'sst_mean', 'productivity_mean', 'chlorophyll_mean',  'magnitude_gradient_mean'),training=TRUE)
 saveRDS(banter_data_ici, file='epacific_banter_data_ici.rds')
+
+banter_data_env <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), training=TRUE)
+saveRDS(banter_data_env, file='epacific_banter_data_env.rds')
 
 #save update of Acoustic Study
 saveRDS(data_ch1only, 'epacific_study.rds')
@@ -172,184 +164,296 @@ saveRDS(data, 'epacificALL_study.rds')
 
 ## Build a BANTER Classification Model
 
-### *Simple Model*
+### *EC (only) Model*
 
-Load data, initialize a BANTER model, and create an initial BANTER
-detector model (stage 1).
+Initialize, Run & Evaluate Detector Model (stage 1).
 
-```{r, read banter model, include=FALSE, eval=!freshRun}
-banter_model <- readRDS('epacific_banter_model_t1e4s3_t1e4s4.rds')
-```
+```{r, banter ec detector model, eval=freshRun}
+banter_model_ec <- initBanterModel(banter_data$events)
+banter_model_ec <- addBanterDetector(banter_model_ec, banter_data$detectors, ntree=1e4, sampsize=3, importance = TRUE)
 
-```{r, banter detector model, eval=freshRun}
-banter_model <- initBanterModel(banter_data$events)
-banter_model <- addBanterDetector(banter_model, banter_data$detectors, ntree=1e4, sampsize=3, importance = TRUE)
-```
-
-Check for stability (are more trees needed?) before moving on
-
-```{r, banter detector model stability, eval=freshRun}
-plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 1:3))
-plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 4:6))
-summary(banter_model)
+plotDetectorTrace(banter_model_ec, detector = paste0('Click_Detector_', 1:3))
+plotDetectorTrace(banter_model_ec, detector = paste0('Click_Detector_', 4:6))
+summary(banter_model_ec)
 ```
 
 Run BANTER Event Model (stage 2)
 
-```{r, banter event model, eval=freshRun}
-banter_model <- runBanterModel(banter_model, ntree=1e4, sampsize=4)
-summary(banter_model)
+```{r, banter ec event model, eval=freshRun}
+banter_model_ec <- runBanterModel(banter_model_ec, ntree=1e4, sampsize=4)
+summary(banter_model_ec)
 ```
 
-Check for stability (are more trees needed?). If acceptable, save model
-with tree/sampsize info in the filename.
+Once a stable model is identified, save model with tree/sampsize info in
+the filename.
 
-```{r,save banter model, eval=freshRun}
-saveRDS(banter_model, 'epacific_banter_model_t1e4s3_t1e4s4.rds')
+```{r,save banter ec model, eval=freshRun}
+saveRDS(banter_model_ec, 'epacific_banter_model_ec_t1e4s3_t1e4s4.rds')
 ```
 
 ### *ICI Model*
 
-Load data (if previously run)
-
-```{r, read banter ici model, include=FALSE, eval=!freshRun}
-banter_model_ici <- readRDS('epacific_banter_model_ici_t1e4s3_t1e4s4.rds')
-```
-
-Fresh Run: Initialize, Run & Evaluate Detector Model
+Initialize, Run & Evaluate Detector Model (stage 1).
 
 ```{r, banter ici detector model, eval=freshRun}
 banter_model_ici <- initBanterModel(banter_data_ici$events)
 banter_model_ici <- addBanterDetector(banter_model_ici, banter_data_ici$detectors, ntree=1e4, sampsize=3, importance = TRUE)
+
 plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 1:3))
 plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 4:6))
 summary(banter_model_ici)
 ```
 
-Run Event Model
+Run Event Model (stage 2)
 
 ```{r, banter ici event model, eval=freshRun}
 banter_model_ici <- runBanterModel(banter_model_ici, ntree=1e4, sampsize=4)
 summary(banter_model_ici)
 ```
 
-Save BANTER model
+Once a stable model is identified, save model with tree/sampsize info in
+the filename.
 
 ```{r, save banter ici model, eval=freshRun}
 saveRDS(banter_model_ici, 'epacific_banter_model_ici_t1e4s3_t1e4s4.rds')
 ```
+### *ENV Model*
 
+Initialize, Run & Evaluate Detector Model (stage 1).
+```{r, banter env detector model, eval=freshRun}
+banter_model_env <- initBanterModel(banter_data_env$events)
+banter_model_env <- addBanterDetector(banter_model_env, banter_data_env$detectors, ntree=1e4, sampsize=1, importance = TRUE)
+
+plotDetectorTrace(banter_model_env, detector = paste0('Click_Detector_', 1:3))
+plotDetectorTrace(banter_model_env, detector = paste0('Click_Detector_', 4:6))
+summary(banter_model_env)
+```
+
+Run Event Model (stage 2)
+```{r, banter env event model, eval=freshRun}
+banter_model_env <- runBanterModel(banter_model_env, ntree=1e4, sampsize=5)
+summary(banter_model_env)
+```
+
+Once a stable model is identified, save model with tree/sampsize info in
+the filename.
+
+```{r, save banter env model, eval=freshRun}
+saveRDS(banter_model_env, 'epacific_banter_model_env_t1e4s1_t1e4s5.rds')
+```
 ## BANTER Analytics
 
 There are a number of visualizations/data products that allow us to
 visualize our BANTER classifier; most use the rfPermute package (see
 [BANTER
 Guidelines](https://taikisan21.github.io/PAMpal/banterGuide.html) for
-more information. First, identify the model you would like to examine
-(comment out the model you [do not]{.underline} want to examine).
+more information.
 
-```{r, identify model}
-model <- banter_model
-modelname <- "banter_model"
+First, load the models (if not a fresh run)
+
+```{r, read banter model, include=FALSE, eval=!freshRun}
+banter_model_ec <- readRDS('epacific_banter_model_ec_t1e4s3_t1e4s4.rds')
+banter_model_ici <- readRDS('epacific_banter_model_ici_t1e4s3_t1e4s4.rds')
+banter_model_env <- readRDS('epacific_banter_model_env_t1e4s1_t1e4s5.rds')
+```
+
+Identify the model you would like to examine (comment out the model you
+[do not]{.underline} want to examine).
+
+```{r, identify model, eval=!freshRun}
+model_ec <- banter_model_ec
+modelname_ec <- "banter_model_ec"
 
 model_ici <- banter_model_ici
 modelname_ici <- "banter_model_ici"
+
+model_env <- banter_model_env
+modelname_env <- "banter_model_env"
 ```
 
 Extract the Random Forest model object from our BANTER model for
 analysis.
 
-```{r, extract RF model}
-banter_model_RF <- getBanterModel(model)
+```{r, extract RF model, eval=!freshRun}
+banter_model_ec_RF <- getBanterModel(model_ec)
 banter_model_ici_RF <- getBanterModel(model_ici)
-```
-
-Confusion Matrix
-
-```{r, confusion matrix, include=TRUE}
-epacific_confuseMatrix <- rfPermute::confusionMatrix(banter_model_RF)
-epacific_confuseMatrix <- kable(epacific_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
-  kable_classic()%>%
-  column_spec(6, border_right = TRUE)%>%
-  row_spec(0, bold = TRUE)%>%
-  row_spec(4,hline_after = TRUE)%>%
-  row_spec(6, bold = TRUE)%>%
-  save_kable(paste(modelname, "epacific_confuseMatrix.png", sep="_"), zoom = 2)
-
-epacific_ici_confuseMatrix <- rfPermute::confusionMatrix(banter_model_ici_RF)
-epacific_ici_confuseMatrix <- kable(epacific_ici_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
-  kable_classic()%>%
-  column_spec(6, border_right = TRUE)%>%
-  row_spec(0, bold = TRUE)%>%
-  row_spec(4,hline_after = TRUE)%>%
-  row_spec(6, bold = TRUE)%>%
-  save_kable(paste(modelname_ici, "epacific_ici_confuseMatrix.png", sep="_"), zoom = 2)
-```
-
-Proximity Plot
-
-```{r, proximity plot, include=TRUE}
-png(paste(modelname, "epacific_proximity.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
-epacific_proximityPlot <- plotProximity(banter_model_RF)
-dev.off()
-epacific_proximityPlot <- plotProximity(banter_model_RF)
-
-png(paste(modelname_ici, "epacific_proximity.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
-ici_epacific_proximityPlot <- plotProximity(banter_model_ici_RF)
-dev.off()
-ici_epacific_proximityPlot <- plotProximity(banter_model_ici_RF)
-
-
-```
-
-Importance Heatmap
-
-```{r, importance heat map, include=TRUE}
-png(paste(modelname, "epacific_importance.png", sep="_"), width = 30, height = 25, units = 'cm',  res = 300)
-plotImportance(banter_model_RF, plot.type="heatmap")
-dev.off()
-epacific_importance <- plotImportance(banter_model_RF, plot.type="heatmap")
-
-png(paste(modelname_ici, "epacific_importance.png", sep="_"), width = 30, height = 25, units = 'cm',  res = 300)
-plotImportance(banter_model_ici_RF, plot.type="heatmap")
-dev.off()
-ici_epacific_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
-```
-
-PlotVotes
-
-```{r, plot votes, include=TRUE}
-png(paste(modelname, "epacific_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
-plotVotes(banter_model_RF)
-dev.off()
-epacific_votes <- plotVotes(banter_model_RF)
-
-png(paste(modelname_ici, "epacific_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
-plotVotes(banter_model_ici_RF)
-dev.off()
-ici_epacific_votes <- plotVotes(banter_model_ici_RF)
+banter_model_env_RF <- getBanterModel(model_env)
 ```
 
 Class Priors (Expected Error Rate)
 
-```{r, class priors, include=TRUE}
-epacific_priors <- classPriors(banter_model_RF, NULL)
+```{r, class priors, include=TRUE, eval=!freshRun}
+epacific_ec_priors <- classPriors(banter_model_ec_RF, NULL)[,1]
+epacific_ici_priors <- classPriors(banter_model_ici_RF, NULL)[,1]
+epacific_env_priors <- classPriors(banter_model_env_RF, NULL)[,1]
 ```
 
-Plot Confusion Matrix Heat Map
+Confusion Matrix
 
-```{r, confusion matrix heat map, include=TRUE}
-plotConfMat(banter_model_RF, title="ConfusionMatrix", plot=TRUE)
+```{r, confusion matrix, include=TRUE, eval=!freshRun}
+epacific_ec_confuseMatrix <- rfPermute::confusionMatrix(banter_model_ec_RF)
+epacific_ec_confuseMatrix <- cbind(epacific_ec_confuseMatrix, priors = epacific_ec_priors)
+epacific_ec_confuseMatrix <- kable(epacific_ec_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+   column_spec(7, border_right = TRUE)%>%
+   row_spec(0, bold = TRUE)%>%
+   row_spec(4,hline_after = TRUE)%>%
+   row_spec(7, bold = TRUE)%>%
+   save_kable("../manuscript/manuscript_files/epacific_ec_confuseMatrix.png", zoom = 9)
+
+epacific_ici_confuseMatrix <- rfPermute::confusionMatrix(banter_model_ici_RF)
+epacific_ici_confuseMatrix <- cbind(epacific_ici_confuseMatrix, priors = epacific_ici_priors)
+epacific_ici_confuseMatrix <- kable(epacific_ici_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(7, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(4,hline_after = TRUE)%>%
+  row_spec(7, bold = TRUE)%>%
+  save_kable("../manuscript/manuscript_files/epacific_ici_confuseMatrix.png", zoom = 9)
+
+epacific_env_confuseMatrix <- rfPermute::confusionMatrix(banter_model_env_RF)
+epacific_env_confuseMatrix <- cbind(epacific_env_confuseMatrix, priors = epacific_env_priors)
+epacific_env_confuseMatrix <- kable(epacific_env_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(7, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(4,hline_after = TRUE)%>%
+  row_spec(7, bold = TRUE)%>%
+  save_kable("../manuscript/manuscript_files/epacific_env_confuseMatrix.png", zoom = 9)
 ```
 
-Plot Error Trace for Banter Model
+![BANTER Model E.Pacific EC Confusion
+Matrix](../manuscript/manuscript_files/epacific_ec_confuseMatrix.png)
 
-```{r, model error trace, include=TRUE}
-plot(banter_model_RF)
+![BANTER Model E.Pacific ICI Confusion
+Matrix](../manuscript/manuscript_files/epacific_ici_confuseMatrix.png)
+
+![BANTER Model E.Pacific ENV Confusion
+Matrix](../manuscript/manuscript_files/epacific_env_confuseMatrix.png)
+
+
+Proximity Plot
+
+```{r, proximity plot, include=TRUE, results=FALSE}
+png(('../manuscript/manuscript_files/epacific_ec_proximity.png'), width = 20, height = 20, units = 'cm',  res = 300)
+plotProximity(banter_model_ec_RF)
+dev.off()
+ec_epacific_proximityPlot <- plotProximity(banter_model_ec_RF)
+
+png(('../manuscript/manuscript_files/epacific_ici_proximity.png'), width = 20, height = 20, units = 'cm',  res = 300)
+ici_epacific_proximityPlot <- plotProximity(banter_model_ici_RF)
+dev.off()
+ici_epacific_proximityPlot <- plotProximity(banter_model_ici_RF)
+
+png(('../manuscript/manuscript_files/epacific_env_proximity.png'), width = 20, height = 20, units = 'cm',  res = 300)
+env_epacific_proximityPlot <- plotProximity(banter_model_env_RF)
+dev.off()
+env_epacific_proximityPlot <- plotProximity(banter_model_env_RF)
+```
+
+Importance Heatmap
+
+```{r, importance heat map, include=TRUE, results=FALSE}
+png(('../manuscript/manuscript_files/epacific_ec_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
+plotImportance(banter_model_ec_RF, plot.type="heatmap")
+dev.off()
+ec_epacific_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap")
+
+png(('../manuscript/manuscript_files/epacific_ici_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
+plotImportance(banter_model_ici_RF, plot.type="heatmap")
+dev.off()
+ici_epacific_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
+
+png(('../manuscript/manuscript_files/epacific_env_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
+plotImportance(banter_model_env_RF, plot.type="heatmap")
+dev.off()
+env_epacific_importance <- plotImportance(banter_model_env_RF, plot.type="heatmap")
+```
+
+PlotVotes
+
+```{r, plot votes, include=TRUE, results=FALSE}
+png(('../manuscript/manuscript_files/epacific_ec_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_ec_RF)
+dev.off()
+epacific_votes <- plotVotes(banter_model_ec_RF)
+
+png(('../manuscript/manuscript_files/epacific_ici_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_ici_RF)
+dev.off()
+ici_epacific_votes <- plotVotes(banter_model_ici_RF)
+
+png(('../manuscript/manuscript_files/epacific_env_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_env_RF)
+dev.off()
+env_epacific_votes <- plotVotes(banter_model_env_RF)
 ```
 
 Plot Predicted Probabilities
 
 ```{r, predicted probabilities, include=TRUE}
-plotPredictedProbs(banter_model_RF, bins=30, plot=TRUE)
+plotPredictedProbs(banter_model_ec_RF, bins=30, plot=TRUE)
+plotPredictedProbs(banter_model_ici_RF, bins=30, plot=TRUE)
+plotPredictedProbs(banter_model_env_RF, bins=30, plot=TRUE)
+```
+
+Create Figure for Publication
+
+```{r, Publication Figures, include=TRUE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+epacific_ec_Figure <-image_append(c(prox, heat, vote))
+epacific_ec_Figure<- image_append(c(confuse, epacific_ec_Figure), stack=TRUE)
+image_write(epacific_ec_Figure, path = here('manuscript', 'manuscript_files','epacific_ec_Figure.png'), format ='png')
+print(epacific_ec_Figure, info=FALSE)
+
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+epacific_ici_Figure <-image_append(c(prox, heat, vote))
+epacific_ici_Figure<- image_append(c(confuse, epacific_ici_Figure), stack=TRUE)
+image_write(epacific_ici_Figure, path = here('manuscript', 'manuscript_files','epacific_ici_Figure.png'), format ='png')
+print(epacific_ici_Figure, info=FALSE)
+
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_env_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_env_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_env_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_env_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+epacific_env_Figure <-image_append(c(prox, heat, vote))
+epacific_env_Figure<- image_append(c(confuse, epacific_env_Figure), stack=TRUE)
+image_write(epacific_env_Figure, path = here('manuscript', 'manuscript_files','epacific_env_Figure.png'), format ='png')
+print(epacific_env_Figure, info=FALSE)
 ```

@@ -1,7 +1,7 @@
 ---
 title: "BANTER for Beaked Whales: Hawaii"
 author: "Shannon Rankin"
-date: "2023-02-06"
+date: "2023-05-24"
 output: html_document
 editor_options: 
   markdown: 
@@ -15,17 +15,24 @@ knitr::opts_chunk$set(echo = TRUE)
 # TRUE will run everything from scratch - this will take a long time
 freshRun <- FALSE
 ```
+/Project
+  |-Database/
+  |-Binaries/
+  |-Figures/
+  |-hawaii
+    |_ beakerBanter_hawaii.Rmd
+    |_ hawaii_banter_data.rds
+    |_ hawaii_banter_data_ici.rds
+    |_ hawaii_banter_model_t5e3s10_t1e4s4.rds
+    |_ hawaii_banter_model_ici_t5e3s5_t1e4s4.rds
 
 ## PAMpal Data Processing
 
 Start by loading the required packages
 
 ```{r, load packages, message=FALSE}
-library(PAMpal)
-library(banter)
-library(rfPermute)
-library(kableExtra)
-library(here)
+library("easypackages")
+libraries("PAMpal", "banter", "rfPermute", "kableExtra", "magick", "magrittr", "here")
 here()
 ```
 
@@ -42,16 +49,6 @@ pps <- PAMpalSettings(db='Database/',
 
 2.  Process data and save to file to eliminate repeated processing.
 
-[If]{.underline} you have already run the processing code, ensure you
-have set 'freshRun = FALSE' at top of this document to read in the
-existing .rds file for downstream processing.
-
-```{r, read acoustic study, include=FALSE, eval=!freshRun}
-data <- readRDS('hawaii_study.rds')
-# Double check warning messages
-print(getWarnings(data)$message)
-```
-
 [If]{.underline} this is the [initial processing]{.underline}, ensure
 you have set 'freshRun = TRUE' at top of this document to process and
 save data. This will take some time to run.
@@ -63,20 +60,30 @@ saveRDS(data, 'hawaii_study.rds')
 print(getWarnings(data)$message)
 ```
 
+[If]{.underline} you have already run the processing code, ensure you
+have set 'freshRun = FALSE' at top of this document to read in the
+existing .rds file for downstream processing.
+
+```{r, read acoustic study, include=FALSE, eval=!freshRun}
+data_ch1only <- readRDS('hawaii_study.rds')
+# Double check warning messages
+print(getWarnings(data_ch1only)$message)
+```
+
 3.  Assign species identity according to original PAMguard labels, then
     relabel for consistency across projects.
 
-```{r, assign species ID}
+```{r, assign species ID, eval=freshRun}
 data <- setSpecies(data, 'pamguard')
 reSpecies <- readRDS('species.rds')
 print(reSpecies)
 data <- setSpecies(data, 'reassign', value=reSpecies)
 ```
 
-3.  Filter out unwanted data: (1) subset and rename species for BANTER
+4.  Filter out unwanted data: (1) subset and rename species for BANTER
     model and (2) filter to retain only Channel 1.
 
-```{r, filter unwanted data}
+```{r, filter unwanted data, eval=freshRun}
 goodSpecies<- c("ZC", "MD", "BW", "BWC", "IP", "BW", "possBW")
 data <- filter(data, species %in% goodSpecies)
 data <- setSpecies(data, method='reassign',
@@ -86,7 +93,7 @@ data_ch1only <- filter(data, Channel == '1')
 
 5.  Calculate Inter-Click Interval (ICI).
 
-```{r, calculate ICI}
+```{r, calculate ICI, eval=freshRun}
 data_ch1only <- calculateICI(data_ch1only, time='peakTime')
 ```
 
@@ -108,78 +115,50 @@ saveRDS(data_ch1only, 'hawaii_study.rds')
 
 ## Build a BANTER Classification Model
 
-### *Model without ICI*
+### *EC (only) Model*
 
-Load data, initialize a BANTER model, and create an initial BANTER
-detector model (stage 1).
+Initialize, Run & Evaluate Detector Model (stage 1).
+```{r, banter ec detector model, eval=freshRun}
+banter_model_ec <- initBanterModel(banter_data$events)
+banter_model_ec <- addBanterDetector(banter_model_ec, banter_data$detectors, ntree=5e3, sampsize=10, importance = TRUE)
 
-```{r, read banter model, include=FALSE, eval=!freshRun}
-banter_model <- readRDS('hawaii_banter_model_t5e3s10_t10e3s4.rds')
-```
-
-```{r, banter detector model, eval=freshRun}
-banter_model <- initBanterModel(banter_data$events)
-banter_model <- addBanterDetector(banter_model, banter_data$detectors, ntree=5e3, sampsize=10, importance = TRUE)
-```
-
-Check for stability (are more trees needed?) before moving on
-
-```{r, banter detector model stability}
-plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 0:2))
-plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 3:5))
-plotDetectorTrace(banter_model, detector = paste0('Click_Detector_', 6))
-summary(banter_model)
+plotDetectorTrace(banter_model_ec, detector = paste0('Click_Detector_', 0:3))
+plotDetectorTrace(banter_model_ec, detector = paste0('Click_Detector_', 4:6))
+summary(banter_model_ec)
 ```
 
 Run BANTER Event Model (stage 2)
-
-```{r, banter event model, eval=freshRun}
-banter_model <- runBanterModel(banter_model, ntree=10e3, sampsize=4)
-summary(banter_model)
+```{r, banter ec event model, eval=freshRun}
+banter_model_ec <- runBanterModel(banter_model_ec, ntree=1e4, sampsize=4)
+summary(banter_model_ec)
 ```
 
-Check for stability (are more trees needed?). If acceptable, save model
-with tree/sampsize info in the filename.
-
-```{r,save banter model, eval=freshRun}
-saveRDS(banter_model, 'hawaii_banter_model_t5e3s10_t10e3s4.rds')
+Once a stable model is identified, save model with tree/sampsize info in the filename.
+```{r,save banter ec model, eval=freshRun}
+saveRDS(banter_model_ec, 'hawaii_banter_model_ec_t5e3s10_t1e4s4.rds')
 ```
 
 ### *ICI Model*
 
-Load data, initialize a BANTER model, and create an initial BANTER
-detector model (stage 1).
-
-```{r, read banter ici model, include=FALSE, eval=!freshRun}
-banter_model_ici <- readRDS('hawaii_banter_model_ici_t5e3s5_t10e3s4.rds')
-```
-
+Initialize, Run & Evaluate Detector Model (stage 1)
 ```{r, banter ici detector model, eval=freshRun}
 banter_model_ici <- initBanterModel(banter_data_ici$events)
 banter_model_ici <- addBanterDetector(banter_model_ici, banter_data_ici$detectors, ntree=5e3, sampsize=5, importance = TRUE)
-```
 
-Check for stability to see if we need more trees
-
-```{r, banter ici detector model stability}
-plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 0:2))
-plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 3:5))
-plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 6))
+plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 0:3))
+plotDetectorTrace(banter_model_ici, detector = paste0('Click_Detector_', 4:6))
 summary(banter_model_ici)
 ```
 
 Run BANTER Event Model (stage 2)
-
 ```{r, banter ici event model, eval=freshRun}
-banter_model_ici <- runBanterModel(banter_model_ici, ntree=10e3, sampsize=4)
+banter_model_ici <- runBanterModel(banter_model_ici, ntree=1e4, sampsize=4)
 summary(banter_model_ici)
 ```
 
-Check for stability (are more trees needed?). If acceptable, save model
-with tree/sampsize info in the filename.
-
+Once a stable model is identified, save model with tree/sampsize info in the filename.
 ```{r, save banter ici model, eval=freshRun}
-saveRDS(banter_model_ici, 'hawaii_banter_model_ici_t5e3s5_t10e3s4.rds')
+saveRDS(banter_model_ici, 'hawaii_banter_model_ici_t5e3s5_t1e4s4.rds')
 ```
 
 ## BANTER Analytics
@@ -190,12 +169,19 @@ visualize our BANTER classifier; most use the rfPermute package (see
 Guidelines](https://taikisan21.github.io/PAMpal/banterGuide.html) for
 more information)
 
+
+```{r, read banter model, include=FALSE, eval=!freshRun}
+banter_model_ec <- readRDS('hawaii_banter_model_ec_t5e3s10_t1e4s4.rds')
+banter_model_ici <- readRDS('hawaii_banter_model_ici_t5e3s5_t1e4s4.rds')
+```
+
+
 First, identify the model you would like to examine (comment out the
 model you [do not]{.underline} want to examine).
 
 ```{r, identify model}
-model <- banter_model
-modelname <- "banter_model"
+model_ec <- banter_model_ec
+modelname_ec <- "banter_model_ec"
 
 model_ici <- banter_model_ici
 modelname_ici <- "banter_model_ici"
@@ -205,42 +191,57 @@ Extract the Random Forest model object from our BANTER model for
 analysis.
 
 ```{r, extract RF model}
-banter_model_RF <- getBanterModel(model)
+banter_model_ec_RF <- getBanterModel(model_ec)
 banter_model_ici_RF <- getBanterModel(model_ici)
+```
+
+Class Priors (Expected Error Rate)
+
+```{r, class priors, include=TRUE}
+hawaii_ec_priors <- classPriors(banter_model_ec_RF, NULL)[,1]
+hawaii_ici_priors <- classPriors(banter_model_ici_RF, NULL)[,1]
 ```
 
 Confusion Matrix
 
 ```{r, confusion matrix, include=TRUE}
-hawaii_confuseMatrix <- rfPermute::confusionMatrix(banter_model_RF)
-hawaii_confuseMatrix <- kable(hawaii_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+hawaii_ec_confuseMatrix <- rfPermute::confusionMatrix(banter_model_ec_RF)
+hawaii_ec_confuseMatrix <- cbind(hawaii_ec_confuseMatrix, priors = hawaii_ec_priors)
+hawaii_ec_confuseMatrix <- kable(hawaii_ec_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
   kable_classic()%>%
   column_spec(5, border_right = TRUE)%>%
   row_spec(0, bold = TRUE)%>%
   row_spec(5,hline_after = TRUE)%>%
   row_spec(5, bold = TRUE)%>%
-  save_kable(paste(modelname, "hawaii_confuseMatrix.png", sep="_"), zoom = 2)
+  save_kable('../manuscript/manuscript_files/hawaii_ec_confuseMatrix.png', zoom = 9)
 
 hawaii_ici_confuseMatrix <- rfPermute::confusionMatrix(banter_model_ici_RF)
+hawaii_ici_confuseMatrix <- cbind(hawaii_ici_confuseMatrix, priors = hawaii_ici_priors)
 hawaii_ici_confuseMatrix <- kable(hawaii_ici_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
   kable_classic()%>%
   column_spec(5, border_right = TRUE)%>%
   row_spec(0, bold = TRUE)%>%
   row_spec(5,hline_after = TRUE)%>%
   row_spec(5, bold = TRUE)%>%
-  save_kable(paste(modelname_ici, "hawaii_ici_confuseMatrix.png", sep="_"), zoom = 2)
+  save_kable('../manuscript/manuscript_files/hawaii_ici_confuseMatrix.png', zoom = 9)
 
 ```
 
+![BANTER Model Hawaii EC Confusion
+Matrix](../manuscript/manuscript_files/hawaii_ec_confuseMatrix.png)
+
+![BANTER Model Hawaii ICI Confusion
+Matrix](../manuscript/manuscript_files/hawaii_ici_confuseMatrix.png)
+
 Proximity Plot
 
-```{r, proximity plot, include=TRUE}
-png(paste(modelname, "hawaii_proximity.png", sep="_"), width = 20, height = 20, units = 'cm', res = 300)
-hawaii_proximityPlot <- plotProximity(banter_model_RF)
+```{r, proximity plot, include=TRUE, results=FALSE}
+png(('../manuscript/manuscript_files/hawaii_ec_proximity.png'), width = 20, height = 20, units = 'cm',  res = 300)
+plotProximity(banter_model_ec_RF)
 dev.off()
-hawaii_proximityPlot <- plotProximity(banter_model_RF)
+ec_hawaii_proximityPlot <- plotProximity(banter_model_ec_RF)
 
-png(paste(modelname_ici, "hawaii_proximity.png", sep="_"), width = 20, height = 20, units = 'cm', res = 300)
+png(('../manuscript/manuscript_files/hawaii_ici_proximity.png'), width = 20, height = 20, units = 'cm',  res = 300)
 ici_hawaii_proximityPlot <- plotProximity(banter_model_ici_RF)
 dev.off()
 ici_hawaii_proximityPlot <- plotProximity(banter_model_ici_RF)
@@ -248,13 +249,13 @@ ici_hawaii_proximityPlot <- plotProximity(banter_model_ici_RF)
 
 Importance Heatmap
 
-```{r, importance heat map, include=TRUE}
-png(paste(modelname, "hawaii_importance.png", sep="_"), width = 30, height = 25, units = 'cm', res = 300)
-plotImportance(banter_model_RF, plot.type="heatmap")
+```{r, importance heat map, include=TRUE, results=FALSE}
+png(('../manuscript/manuscript_files/hawaii_ec_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
+plotImportance(banter_model_ec_RF, plot.type="heatmap")
 dev.off()
-hawaii_importance <- plotImportance(banter_model_RF, plot.type="heatmap")
+ec_hawaii_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap")
 
-png(paste(modelname_ici, "hawaii_importance.png", sep="_"), width = 30, height = 25, units = 'cm', res = 300)
+png(('../manuscript/manuscript_files/hawaii_ici_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
 plotImportance(banter_model_ici_RF, plot.type="heatmap")
 dev.off()
 ici_hawaii_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
@@ -262,38 +263,62 @@ ici_hawaii_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap"
 
 PlotVotes
 
-```{r, plot votes, include=TRUE}
-png(paste(modelname, "hawaii_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
-plotVotes(banter_model_RF)
+```{r, plot votes, include=TRUE, results=FALSE}
+png(('../manuscript/manuscript_files/hawaii_ec_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_ec_RF)
 dev.off()
-hawaii_votes <- plotVotes(banter_model_RF)
+hawaii_votes <- plotVotes(banter_model_ec_RF)
 
-png(paste(modelname_ici, "hawaii_votes.png", sep="_"), width = 20, height = 20, units = 'cm',  res = 300)
+png(('../manuscript/manuscript_files/hawaii_ici_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
 plotVotes(banter_model_ici_RF)
 dev.off()
 ici_hawaii_votes <- plotVotes(banter_model_ici_RF)
 ```
 
-Class Priors (Expected Error Rate)
-
-```{r, class priors, include=TRUE}
-hawaii_priors <- classPriors(banter_model_RF, NULL)
-```
-
-Plot Confusion Matrix Heat Map
-
-```{r, confusion matrix heat map, include=TRUE}
-plotConfMat(banter_model_RF, title="ConfusionMatrix", plot=TRUE)
-```
-
-Plot Error Trace for Banter Model
-
-```{r, model error trace, include=TRUE}
-plot(banter_model_RF)
-```
-
 Plot Predicted Probabilities
 
-```{r, predicted probabilities, include=TRUE}
-plotPredictedProbs(banter_model_RF, bins=30, plot=TRUE)
+```{r, predicted probabilities, include=TRUE, results=FALSE}
+plotPredictedProbs(banter_model_ec_RF, bins=30, plot=TRUE)
+plotPredictedProbs(banter_model_ici_RF, bins=30, plot=TRUE)
+```
+
+Create Figure for Publication
+```{r, Publication Figure, include=TRUE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ec_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ec_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ec_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ec_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+hawaii_ec_Figure <-image_append(c(prox, heat, vote))
+hawaii_ec_Figure<- image_append(c(confuse, hawaii_ec_Figure), stack=TRUE)
+image_write(hawaii_ec_Figure, path = here('manuscript', 'manuscript_files','hawaii_ec_Figure.png'), format ='png')
+print(hawaii_ec_Figure, info=FALSE)
+
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+hawaii_ici_Figure <-image_append(c(prox, heat, vote))
+hawaii_ici_Figure<- image_append(c(confuse, hawaii_ici_Figure), stack=TRUE)
+image_write(hawaii_ici_Figure, path = here('manuscript', 'manuscript_files','hawaii_ici_Figure.png'), format ='png')
+print(hawaii_ici_Figure, info=FALSE)
 ```
