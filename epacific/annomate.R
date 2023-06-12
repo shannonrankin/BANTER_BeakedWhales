@@ -7,6 +7,7 @@ library(PAMpal)
 library(here)
 here()
 
+
 data <- readRDS('epacific/epacific_study.rds')
 specMap <- data.frame(
   old = unique(species(data)),
@@ -14,20 +15,18 @@ specMap <- data.frame(
 specMap$new <- c('Ziphius cavirostris', 'possible Ziphiidae', 'Ziphiidae', 
                  'Mesoplodon carlhubbsi', 'BW43', 'Berardius bairdii', 
                  'Cross Seamount beaked whale', 'Mesoplodon stejnegeri')
+
 anno <- prepAnnotation(data, specMap = specMap, mode='event',
-                       # following args are optional, fill in
-                       # any that will be the same for all entries
                        source = 'figshare.com',
+                       source_id = 22959786, 
+                       annotator = 'Anne Simonis, Jenny Trickey',
+                       annotation_date = 2019,
+                       annotation_info_url = 'https://figshare.com/articles/dataset/BWEventClips_CCES2018/22959786',
+                       recording_info_url = 'https://figshare.com/articles/online_resource/CCES_2018_Final_Acoustic_Report/19358036',
+                       type = 'echolocation click event',
                        contact = 'shannon.rankin@noaa.gov')
-# or you can add them later
-anno$source = 'figshare.com'
-anno$source_id = 22959786
-anno$annotator = 'Anne Simonis, https://figshare.com/articles/online_resource/CCES_2018_Final_Acoustic_Report/19358036'
+
 anno$annotation_id = anno$event
-anno$annotation_date = 2019
-anno$annotation_info_url = 'https://figshare.com/articles/dataset/BWEventClips_CCES2018/22959786'
-anno$recording_info_url = 'https://figshare.com/articles/online_resource/CCES_2018_Final_Acoustic_Report/19358036'
-anno$type = 'echolocation click event'
 
 library(PAMmisc)
 # to get figshare data you will need the article id and your personal token
@@ -41,7 +40,7 @@ anno <- matchRecordingUrl(anno, figshareData)
 # will give you warnings and messages about missing fields
 checkAnnotation(anno)
 # if you need to fix any manually, write to csv then read back in
-annoFile <- 'AnnomateExport.csv'
+annoFile <- 'AnnomateExport_epacific_rankin2023.csv'
 write.csv(anno, file=annoFile, row.names = FALSE)
 # go fix stuff
 anno <- read.csv(annoFile, stringsAsFactors = FALSE)
