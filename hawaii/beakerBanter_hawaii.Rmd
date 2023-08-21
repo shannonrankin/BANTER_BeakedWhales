@@ -286,17 +286,17 @@ Create Figure for Publication
 ```{r, Publication Figure, include=TRUE}
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ec_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ec_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_annotate("d) Vote Plot", size=300, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ec_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_annotate("b) Proximity Plot", size=300, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ec_importance.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
   
 hawaii_ec_Figure <-image_append(c(prox, heat, vote))
 hawaii_ec_Figure<- image_append(c(confuse, hawaii_ec_Figure), stack=TRUE)
@@ -305,17 +305,17 @@ print(hawaii_ec_Figure, info=FALSE)
 
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_annotate("d) Vote Plot", size=300, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_annotate("b) Proximity Plot", size=300, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_importance.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
   
 hawaii_ici_Figure <-image_append(c(prox, heat, vote))
 hawaii_ici_Figure<- image_append(c(confuse, hawaii_ici_Figure), stack=TRUE)

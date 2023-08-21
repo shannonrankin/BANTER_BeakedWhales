@@ -148,13 +148,13 @@ data_ch1only <- matchEnvData(data_ch1only, nc='erdSrtm30plusSeafloorGradient', v
 
 ```{r, banter export, eval=freshRun}
 banter_data <- export_banter(data_ch1only, dropSpecies = c('BW', 'possBW'), 
-                         dropVars = c('All_ici', 'Click_Detector_3_ici', 'sea_floor_depth_mean', 'sst_mean', 'productivity_mean', 'chlorophyll_mean',  'magnitude_gradient_mean'), training=TRUE)
+                         dropVars = c('All_ici', 'Click_Detector_3_ici', 'sea_floor_depth_mean', 'sst_mean', 'productivity_mean', 'chlorophyll_mean',  'magnitude_gradient_mean', 'Latitude', 'Longitude', 'gpsUncertainty'), training=TRUE)
 saveRDS(banter_data, file='epacific_banter_data.rds')
 
-banter_data_ici <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), dropVars = c('sea_floor_depth_mean', 'sst_mean', 'productivity_mean', 'chlorophyll_mean',  'magnitude_gradient_mean'),training=TRUE)
+banter_data_ici <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), dropVars = c('sea_floor_depth_mean', 'sst_mean', 'productivity_mean', 'chlorophyll_mean',  'magnitude_gradient_mean','Latitude', 'Longitude', 'gpsUncertainty'),training=TRUE)
 saveRDS(banter_data_ici, file='epacific_banter_data_ici.rds')
 
-banter_data_env <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), training=TRUE)
+banter_data_env <- export_banter(data_ch1only, dropSpecies = c("BW", "possBW"), dropVars = c('Latitude', 'Longitude', 'gpsUncertainty'), training=TRUE)
 saveRDS(banter_data_env, file='epacific_banter_data_env.rds')
 
 #save update of Acoustic Study
@@ -170,7 +170,7 @@ Initialize, Run & Evaluate Detector Model (stage 1).
 
 ```{r, banter ec detector model, eval=freshRun}
 banter_model_ec <- initBanterModel(banter_data$events)
-banter_model_ec <- addBanterDetector(banter_model_ec, banter_data$detectors, ntree=1e4, sampsize=3, importance = TRUE)
+banter_model_ec <- addBanterDetector(banter_model_ec, banter_data$detectors, ntree=1e4, sampsize=4, importance = TRUE)
 
 plotDetectorTrace(banter_model_ec, detector = paste0('Click_Detector_', 1:3))
 plotDetectorTrace(banter_model_ec, detector = paste0('Click_Detector_', 4:6))
@@ -188,7 +188,7 @@ Once a stable model is identified, save model with tree/sampsize info in
 the filename.
 
 ```{r,save banter ec model, eval=freshRun}
-saveRDS(banter_model_ec, 'epacific_banter_model_ec_t1e4s3_t1e4s4.rds')
+saveRDS(banter_model_ec, 'epacific_banter_model_ec_t1e4s4_t1e4s4.rds')
 ```
 
 ### *ICI Model*
@@ -252,7 +252,7 @@ more information.
 First, load the models (if not a fresh run)
 
 ```{r, read banter model, include=FALSE, eval=!freshRun}
-banter_model_ec <- readRDS('epacific_banter_model_ec_t1e4s3_t1e4s4.rds')
+banter_model_ec <- readRDS('epacific_banter_model_ec_t1e4s4_t1e4s4.rds')
 banter_model_ici <- readRDS('epacific_banter_model_ici_t1e4s3_t1e4s4.rds')
 banter_model_env <- readRDS('epacific_banter_model_env_t1e4s1_t1e4s5.rds')
 ```
@@ -355,19 +355,19 @@ Importance Heatmap
 
 ```{r, importance heat map, include=TRUE, results=FALSE}
 png(('../manuscript/manuscript_files/epacific_ec_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
-plotImportance(banter_model_ec_RF, plot.type="heatmap")
+plotImportance(banter_model_ec_RF, plot.type="heatmap", n=10)
 dev.off()
-ec_epacific_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap")
+ec_epacific_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap", n=10)
 
 png(('../manuscript/manuscript_files/epacific_ici_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
-plotImportance(banter_model_ici_RF, plot.type="heatmap")
+plotImportance(banter_model_ici_RF, plot.type="heatmap", n=10)
 dev.off()
-ici_epacific_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
+ici_epacific_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap", n=10)
 
 png(('../manuscript/manuscript_files/epacific_env_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
-plotImportance(banter_model_env_RF, plot.type="heatmap")
+plotImportance(banter_model_env_RF, plot.type="heatmap", n=10)
 dev.off()
-env_epacific_importance <- plotImportance(banter_model_env_RF, plot.type="heatmap")
+env_epacific_importance <- plotImportance(banter_model_env_RF, plot.type="heatmap", n=10)
 ```
 
 PlotVotes
@@ -402,17 +402,17 @@ Create Figure for Publication
 ```{r, Publication Figures, include=TRUE}
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_annotate("d) Vote Plot", size=300, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_annotate("b) Proximity Plot", size=300, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_importance.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
   
 epacific_ec_Figure <-image_append(c(prox, heat, vote))
 epacific_ec_Figure<- image_append(c(confuse, epacific_ec_Figure), stack=TRUE)
@@ -421,17 +421,17 @@ print(epacific_ec_Figure, info=FALSE)
 
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_annotate("d) Vote Plot", size=300, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_annotate("b) Proximity Plot", size=300, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_importance.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
   
 epacific_ici_Figure <-image_append(c(prox, heat, vote))
 epacific_ici_Figure<- image_append(c(confuse, epacific_ici_Figure), stack=TRUE)
@@ -440,17 +440,17 @@ print(epacific_ici_Figure, info=FALSE)
 
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_env_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_env_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_annotate("d) Vote Plot", size=300, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_env_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_annotate("b) Proximity Plot", size=300, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_env_importance.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
   
 epacific_env_Figure <-image_append(c(prox, heat, vote))
 epacific_env_Figure<- image_append(c(confuse, epacific_env_Figure), stack=TRUE)

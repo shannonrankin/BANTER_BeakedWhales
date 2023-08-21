@@ -39,7 +39,7 @@ print(natlantic_ec_Figure, info=FALSE)
 
 ## EC_ICI_ALT Model
 Detector Model:  ntree=1e4, sampsize=5; 
-Event Model: ntree=1e4, sampsize=5
+Event Model: ntree=1e5, sampsize=5
 ```{r, NAtlantic EC_ICI_ALT Model Figure,  echo=FALSE}
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
@@ -62,7 +62,7 @@ print(natlantic_alt_Figure, info=FALSE)
 
 # SAtlantic
 ## EC Model
-Detector Model:  ntree=1e4, sampsize=2; 
+Detector Model:  ntree=1e4, sampsize=8; 
 Event Model: ntree=1e5, sampsize=1
 ```{r, SAtlantic EC Model Figure,  echo=FALSE}
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_confuseMatrix.png'))%>%
@@ -86,7 +86,7 @@ print(satlantic_ec_Figure, info=FALSE)
 
 ## EC_ICI_ALT Model
 Detector Model:  ntree=1e4, sampsize=4; 
-Event Model: ntree=1e5, sampsize=2
+Event Model: ntree=1e5, sampsize=3
 ```{r, SAtlantic EC_ICI_ALT Model Figure,  echo=FALSE}
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
@@ -155,4 +155,28 @@ heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_i
 epacific_ec_Figure <-image_append(c(prox, heat, vote))
 epacific_ec_Figure<- image_append(c(confuse, epacific_ec_Figure), stack=TRUE)
 print(epacific_ec_Figure, info=FALSE)
+```
+
+## EC_ICI Model
+Detector Model:  ntree=1e4, sampsize=3; 
+Event Model: ntree=1e4, sampsize=4
+
+```{r, EPacific EC ICI Model Figure,  echo=FALSE}
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=100, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=100, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=100, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  
+epacific_ici_Figure <-image_append(c(prox, heat, vote))
+epacific_ici_Figure<- image_append(c(confuse, epacific_ici_Figure), stack=TRUE)
+print(epacific_ici_Figure, info=FALSE)
 ```

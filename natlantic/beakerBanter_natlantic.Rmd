@@ -109,17 +109,40 @@ data <- filter(data, species %in% goodSpecies)
 data <- calculateICI(data, time='peakTime')
 ```
 
-6.  **Export data for BANTER** (and drop species codes that will not be
+6.  **Add GPS data**: Add GPS data from PAMGuard table (2 hour
+    threshold), then filter out data without GPS
+
+```{r, add GPS, eval=freshRun}
+data <- addGps(data, thresh = 7200)#11 events over the threshold
+getWarnings(data)
+```
+
+7. **Add Environmental Data**
+```{r, Add Environmental Data, eval=freshRun}
+#SST
+data <- matchEnvData(data, nc='jplMURSST41mday', var='sst')
+#Seafloor Depth
+data <- matchEnvData(data, nc='usgsCeSS111', var='topo')
+```
+
+8.  **Export data for BANTER** (and drop species codes that will not be
     used for training). We will create two datasets: one with ICI and
     one without ICI, and save these for import into BANTER.
 
 ```{r, banter export, eval=freshRun}
 banter_data <- export_banter(data, dropSpecies = 'unid', 
-                         dropVars = c('All_ici'), training=TRUE)
+                         dropVars = c('All_ici', 'topo', 'sst', 'topo_mean', 'sst_mean', 
+                                      'Latitude', 'Longitude', 'gpsUncertainty'), training=TRUE)
 saveRDS(banter_data, file='natlantic_banter_data.rds')
 
-banter_data_ici <- export_banter(data, dropSpecies = 'unid', training=TRUE)
+banter_data_ici <- export_banter(data, dropSpecies = 'unid', 
+                                 dropVars = c('topo', 'sst', 'topo_mean', 'sst_mean', 
+                                              'Latitude', 'Longitude', 'gpsUncertainty'),training=TRUE)
 saveRDS(banter_data_ici, file='natlantic_banter_data_ici.rds')
+
+banter_data_env <- export_banter(data, dropSpecies = c('unid'), 
+                                 dropVars = c('Latitude', 'Longitude', 'gpsUncertainty'), training=TRUE)
+saveRDS(banter_data_env, file='natlantic_banter_data_env.rds')
 
 #save update of Acoustic Study
 saveRDS(data, 'natlantic_study.rds')
@@ -172,6 +195,32 @@ Once a stable model is identified, save model with tree/sampsize info in the fil
 ```{r, save banter ici model, eval=freshRun}
 saveRDS(banter_model_ici, 'natlantic_banter_model_ici_t1e4s3_t1e5s3.rds')
 ```
+
+### *ENV Model*
+
+Initialize, Run & Evaluate Detector Model (stage 1).
+```{r, banter env detector model, eval=freshRun}
+banter_model_env <- initBanterModel(banter_data_env$events)
+banter_model_env <- addBanterDetector(banter_model_env, banter_data_env$detectors, ntree=1e5, sampsize=3, importance = TRUE)
+
+plotDetectorTrace(banter_model_env, detector = paste0('Click_Detector_', 3:4))
+plotDetectorTrace(banter_model_env, detector = paste0('Click_Detector_', 5:6))
+summary(banter_model_env)
+```
+
+Run Event Model (stage 2)
+```{r, banter env event model, eval=freshRun}
+banter_model_env <- runBanterModel(banter_model_env, ntree=1e5, sampsize=3)
+summary(banter_model_env)
+```
+
+Once a stable model is identified, save model with tree/sampsize info in
+the filename.
+
+```{r, save banter env model, eval=freshRun}
+saveRDS(banter_model_env, 'natlantic_banter_model_env_t1e5s3_t1e5s3.rds')
+```
+
 ### *Alternative Model (EC_ICI_ALT) with larger samp size*
 
 Initialize, Run & Evaluate Detector Model (stage 1).
@@ -186,13 +235,13 @@ summary(banter_model_alt)
 
 Run BANTER Event Model (stage 2)
 ```{r, banter alt event model, eval=freshRun}
-banter_model_alt <- runBanterModel(banter_model_alt, ntree=1e4, sampsize=5)
+banter_model_alt <- runBanterModel(banter_model_alt, ntree=1e5, sampsize=5)
 summary(banter_model_alt)
 ```
 
 Once a stable model is identified, save model with tree/sampsize info in the filename.
 ```{r, save banter alt model, eval=freshRun}
-saveRDS(banter_model_alt, 'natlantic_banter_model_alt_t1e4s5_t1e4s5.rds')
+saveRDS(banter_model_alt, 'natlantic_banter_model_alt_t1e4s5_t1e5s5.rds')
 ```
 ## BANTER Analytics
 
@@ -205,7 +254,8 @@ more information)
 ```{r, read banter model, include=FALSE, eval=!freshRun}
 banter_model_ec <- readRDS('natlantic_banter_ec_model_t1e4s3_t1e4s3.rds')
 banter_model_ici <- readRDS('natlantic_banter_model_ici_t1e4s3_t1e5s3.rds')
-banter_model_alt <- readRDS('natlantic_banter_model_alt_t1e4s5_t1e4s5.rds')
+banter_model_env <- readRDS('natlantic_banter_model_env_t1e5s3_t1e5s3.rds')
+banter_model_alt <- readRDS('natlantic_banter_model_alt_t1e4s5_t1e5s5.rds')
 ```
 
 First, identify the model you would like to examine (comment out the
@@ -218,6 +268,9 @@ modelname_ec <- "banter_model_ec"
 model_ici <- banter_model_ici
 modelname_ici <- "banter_model_ici"
 
+model_env <- banter_model_env
+modelname_env <- "banter_model_env"
+
 model_alt <- banter_model_alt
 modelname_alt <- "banter_model_alt"
 ```
@@ -228,6 +281,7 @@ analysis.
 ```{r, extract RF model, include=TRUE}
 banter_model_ec_RF <- getBanterModel(model_ec)
 banter_model_ici_RF <- getBanterModel(model_ici)
+banter_model_env_RF <- getBanterModel(model_env)
 banter_model_alt_RF <- getBanterModel(model_alt)
 ```
 
@@ -236,6 +290,7 @@ Class Priors (Expected Error Rate)
 ```{r, class priors, include=TRUE}
 natlantic_ec_priors <- classPriors(banter_model_ec_RF, NULL)[,1]
 natlantic_ici_priors <- classPriors(banter_model_ici_RF, NULL)[,1]
+natlantic_env_priors <- classPriors(banter_model_env_RF, NULL)[,1]
 natlantic_alt_priors <- classPriors(banter_model_alt_RF, NULL)[,1]
 ```
 
@@ -264,6 +319,17 @@ natlantic_ici_confuseMatrix <- kable(natlantic_ici_confuseMatrix, align = "c", d
   row_spec(5, bold = TRUE)%>%
   save_kable('../manuscript/manuscript_files/natlantic_ici_confuseMatrix.png', zoom = 9)
 
+natlantic_env_confuseMatrix <- rfPermute::confusionMatrix(banter_model_env_RF)
+natlantic_env_confuseMatrix <- cbind(natlantic_env_confuseMatrix, priors = natlantic_env_priors)
+
+natlantic_env_confuseMatrix <- kable(natlantic_env_confuseMatrix, align = "c", digits = c(0,0,0,0,2,2,2))%>%
+  kable_classic()%>%
+  column_spec(5, border_right = TRUE)%>%
+  row_spec(0, bold = TRUE)%>%
+  row_spec(3,hline_after = TRUE)%>%
+  row_spec(5, bold = TRUE)%>%
+  save_kable('../manuscript/manuscript_files/natlantic_env_confuseMatrix.png', zoom = 9)
+
 natlantic_alt_confuseMatrix <- rfPermute::confusionMatrix(banter_model_alt_RF)
 natlantic_alt_confuseMatrix <- cbind(natlantic_alt_confuseMatrix, priors = natlantic_alt_priors)
 
@@ -283,6 +349,9 @@ Matrix](../manuscript/manuscript_files/natlantic_ec_confuseMatrix.png)
 ![BANTER Model N. Atlantic ICI Confusion
 Matrix](../manuscript/manuscript_files/natlantic_ici_confuseMatrix.png)
 
+![BANTER Model N. Atlantic ENV Confusion
+Matrix](../manuscript/manuscript_files/natlantic_env_confuseMatrix.png)
+
 ![BANTER Model N. Atlantic Alt Confusion
 Matrix](../manuscript/manuscript_files/natlantic_alt_confuseMatrix.png)
 
@@ -300,6 +369,11 @@ ici_natlantic_proximityPlot <- plotProximity(banter_model_ici_RF)
 dev.off()
 ici_natlantic_proximityPlot <- plotProximity(banter_model_ici_RF)
 
+png(('../manuscript/manuscript_files/natlantic_env_proximity.png'), width = 20, height = 20, units = 'cm', res = 300)
+env_natlantic_proximityPlot <- plotProximity(banter_model_env_RF)
+dev.off()
+env_natlantic_proximityPlot <- plotProximity(banter_model_env_RF)
+
 png(('../manuscript/manuscript_files/natlantic_alt_proximity.png'), width = 20, height = 20, units = 'cm', res = 300)
 alt_natlantic_proximityPlot <- plotProximity(banter_model_alt_RF)
 dev.off()
@@ -310,19 +384,24 @@ Importance Heatmap
 
 ```{r, importance heat map, include=TRUE, results=FALSE}
 png(('../manuscript/manuscript_files/natlantic_ec_importance.png'), width = 30, height = 25, units = 'cm', res = 300)
-plotImportance(banter_model_ec_RF, plot.type="heatmap")
+plotImportance(banter_model_ec_RF, plot.type="heatmap", n=10)
 dev.off()
-natlantic_ec_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap")
+natlantic_ec_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap", n=10)
 
 png(('../manuscript/manuscript_files/natlantic_ici_importance.png'), width = 30, height = 25, units = 'cm', res = 300)
-plotImportance(banter_model_ici_RF, plot.type="heatmap")
+plotImportance(banter_model_ici_RF, plot.type="heatmap", n=10)
 dev.off()
-ici_natlantic_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
+ici_natlantic_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap", n=10)
+
+png(('../manuscript/manuscript_files/natlantic_env_importance.png'), width = 30, height = 25, units = 'cm', res = 300)
+plotImportance(banter_model_env_RF, plot.type="heatmap", n=10)
+dev.off()
+env_natlantic_importance <- plotImportance(banter_model_env_RF, plot.type="heatmap", n=10)
 
 png(('../manuscript/manuscript_files/natlantic_alt_importance.png'), width = 30, height = 25, units = 'cm', res = 300)
-plotImportance(banter_model_alt_RF, plot.type="heatmap")
+plotImportance(banter_model_alt_RF, plot.type="heatmap", n=10)
 dev.off()
-alt_natlantic_importance <- plotImportance(banter_model_alt_RF, plot.type="heatmap")
+alt_natlantic_importance <- plotImportance(banter_model_alt_RF, plot.type="heatmap", n=10)
 ```
 
 PlotVotes
@@ -338,6 +417,11 @@ plotVotes(banter_model_ici_RF)
 dev.off()
 ici_natlantic_votes <- plotVotes(banter_model_ici_RF)
 
+png(('../manuscript/manuscript_files/natlantic_env_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
+plotVotes(banter_model_env_RF)
+dev.off()
+env_natlantic_votes <- plotVotes(banter_model_env_RF)
+
 png(('../manuscript/manuscript_files/natlantic_alt_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
 plotVotes(banter_model_alt_RF)
 dev.off()
@@ -349,6 +433,7 @@ Plot Predicted Probabilities
 ```{r, predicted probabilities, include=TRUE, results=FALSE}
 plotPredictedProbs(banter_model_ec_RF, bins=30, plot=TRUE)
 plotPredictedProbs(banter_model_ici_RF, bins=30, plot=TRUE)
+plotPredictedProbs(banter_model_env_RF, bins=30, plot=TRUE)
 plotPredictedProbs(banter_model_alt_RF, bins=30, plot=TRUE)
 ```
 
@@ -356,17 +441,17 @@ Create Figure for Publication
 ```{r, Publication Figure, include=TRUE}
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_annotate("d) Vote Plot", size=300, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_annotate("b) Proximity Plot", size=300, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_importance.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
   
 natlantic_ec_Figure <-image_append(c(prox, heat, vote))
 natlantic_ec_Figure<- image_append(c(confuse, natlantic_ec_Figure), stack=TRUE)
@@ -375,39 +460,58 @@ print(natlantic_ec_Figure, info=FALSE)
 
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ici_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ici_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_annotate("d) Vote Plot", size=300, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ici_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_annotate("b) Proximity Plot", size=300, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ici_importance.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
   
 natlantic_ici_Figure <-image_append(c(prox, heat, vote))
 natlantic_ici_Figure<- image_append(c(confuse, natlantic_ici_Figure), stack=TRUE)
 image_write(natlantic_ici_Figure, path = here('manuscript', 'manuscript_files','natlantic_ici_Figure.png'), format ='png')
 print(natlantic_ici_Figure, info=FALSE)
 
+confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_env_confuseMatrix.png'))%>%
+  image_border(color="#ffffff", geometry = "50x130")%>%
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
+vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_env_votes.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("d) Vote Plot", size=300, color = "black")
+prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_env_proximity.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_annotate("b) Proximity Plot", size=300, color = "black")
+heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_env_importance.png'))%>%
+  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_scale("3300")%>%
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
+  
+natlantic_env_Figure <-image_append(c(prox, heat, vote))
+natlantic_env_Figure<- image_append(c(confuse, natlantic_env_Figure), stack=TRUE)
+image_write(natlantic_env_Figure, path = here('manuscript', 'manuscript_files','natlantic_env_Figure.png'), format ='png')
+print(natlantic_env_Figure, info=FALSE)
+
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_annotate("a) Confusion Matrix", size=300, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_annotate("d) Vote Plot", size=300, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_annotate("b) Proximity Plot", size=300, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_importance.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=300, color = "black")
   
 natlantic_alt_Figure <-image_append(c(prox, heat, vote))
-natlantic_alt_Figure<- image_append(c(confuse, natlantic_ici_Figure), stack=TRUE)
+natlantic_alt_Figure<- image_append(c(confuse, natlantic_alt_Figure), stack=TRUE)
 image_write(natlantic_alt_Figure, path = here('manuscript', 'manuscript_files','natlantic_alt_Figure.png'), format ='png')
 print(natlantic_alt_Figure, info=FALSE)
 ```
