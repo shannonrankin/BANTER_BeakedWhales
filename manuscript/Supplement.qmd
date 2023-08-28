@@ -1,5 +1,5 @@
 ---
-title: Supplement for Open-Source machine learning BANTER acoustic classification of a cryptic echolocating species
+title: Supplement for Open-Source machine learning BANTER acoustic classification of beaked whale echolocation pulses
 author: Shannon Rankin
 date: last-modified
 output: pdf
@@ -13,11 +13,16 @@ here()
 
 
 # NAtlantic
-## EC Model
+Results for the NAtlantic EC (only) model are provided in @fig-natlantic_EC (Detector Model: *sampsize* = 3, *ntree* = 10,000; Event Model: *sampsize* = 3, *ntree* = 10,000).
 
-Detector Model:  ntree=1e4, sampsize=3; 
-Event Model: ntree=1e4, sampsize=3
 ```{r,  NAtlantic EC Model Figure, echo=FALSE}
+#| label: fig-natlantic_EC
+#| fig-cap: BANTER classification results from the NAtlantic dataset including echolocation pulses (EC). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
+#| #| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+#| out-width: 100%
+#| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
   image_annotate("a) Confusion Matrix", size=100, color = "black")
@@ -37,34 +42,19 @@ natlantic_ec_Figure<- image_append(c(confuse, natlantic_ec_Figure), stack=TRUE)
 print(natlantic_ec_Figure, info=FALSE)
 ```
 
-## EC_ICI_ALT Model
-Detector Model:  ntree=1e4, sampsize=5; 
-Event Model: ntree=1e5, sampsize=5
-```{r, NAtlantic EC_ICI_ALT Model Figure,  echo=FALSE}
-confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
-vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_votes.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
-prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_proximity.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
-heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
-  
-natlantic_alt_Figure <-image_append(c(prox, heat, vote))
-natlantic_alt_Figure<- image_append(c(confuse, natlantic_alt_Figure), stack=TRUE)
-print(natlantic_alt_Figure, info=FALSE)
-```
 
 # SAtlantic
-## EC Model
-Detector Model:  ntree=1e4, sampsize=8; 
-Event Model: ntree=1e5, sampsize=1
+
+Results for the SAtlantic EC (only) model are provided in @fig-satlantic_EC (Detector Model: *sampsize* = 8, *ntree* = 10,000; Event Model: *sampsize* = 1, *ntree* = 100,000).
+
 ```{r, SAtlantic EC Model Figure,  echo=FALSE}
+#| label: fig-satlantic_EC
+#| fig-cap: BANTER classification results from the SAtlantic dataset including echolocation pulses (EC). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
+#| #| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+#| out-width: 100%
+#| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
   image_annotate("a) Confusion Matrix", size=100, color = "black")
@@ -84,10 +74,18 @@ satlantic_ec_Figure<- image_append(c(confuse, satlantic_ec_Figure), stack=TRUE)
 print(satlantic_ec_Figure, info=FALSE)
 ```
 
-## EC_ICI_ALT Model
-Detector Model:  ntree=1e4, sampsize=4; 
-Event Model: ntree=1e5, sampsize=3
-```{r, SAtlantic EC_ICI_ALT Model Figure,  echo=FALSE}
+
+
+Results for the SAtlantic EC_IPI_ALT model are provided in @fig-satlantic_EC_IPI_ALT (Detector Model: *sampsize* = 4, *ntree* = 10,000; Event Model: *sampsize* = 3, *ntree* = 100,000).
+
+```{r, SAtlantic EC_IPI_ALT Model Figure,  echo=FALSE}
+#| label: fig-satlantic_EC_IPI_ALT
+#| fig-cap: BANTER classification results from the alternative SAtlantic dataset including echolocation pulses and inter-pulse interval with a large sampsize (EC_IPI_ALT). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
+#| #| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+#| out-width: 100%
+#| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
   image_annotate("a) Confusion Matrix", size=100, color = "black")
@@ -109,10 +107,17 @@ print(satlantic_alt_Figure, info=FALSE)
 
 
 # Hawaii
-## EC_ICI Model
-Detector Model:  ntree=5e3, sampsize=5; 
-Event Model: ntree=1e4, sampsize=4
-```{r, Hawaii EC_ICI Model Figure,  echo=FALSE}
+
+Results for the Hawaii EC_IPI model are provided in @fig-hawaii_EC_IPI (Detector Model: *sampsize* = 5, *ntree* = 100,000; Event Model: *sampsize* = 4, *ntree* = 10,000).
+
+```{r, Hawaii EC_IPI Model Figure,  echo=FALSE}
+#| label: fig-hawaii_EC_IPI
+#| fig-cap: BANTER classification results from the Hawaii dataset including echolocation pulses and inter-pulse interval (EC_IPI). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
+#| #| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+#| out-width: 100%
+#| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
   image_annotate("a) Confusion Matrix", size=100, color = "black")
@@ -133,11 +138,17 @@ print(hawaii_ici_Figure, info=FALSE)
 ```
 
 # EPacific
-## EC Model
-Detector Model:  ntree=1e4, sampsize=3; 
-Event Model: ntree=1e4, sampsize=4
+
+Results for the EPacific EC (only) model are provided in @fig-epacific_EC (Detector Model: *sampsize* = 4, *ntree* = 10,000; Event Model: *sampsize* = 4, *ntree* = 10,000).
 
 ```{r, EPacific EC Model Figure,  echo=FALSE}
+#| label: fig-epacific_EC
+#| fig-cap: BANTER classification results from the EPacific dataset including echolocation pulses (EC). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
+#| #| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+#| out-width: 100%
+#| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
   image_annotate("a) Confusion Matrix", size=100, color = "black")
@@ -157,11 +168,18 @@ epacific_ec_Figure<- image_append(c(confuse, epacific_ec_Figure), stack=TRUE)
 print(epacific_ec_Figure, info=FALSE)
 ```
 
-## EC_ICI Model
-Detector Model:  ntree=1e4, sampsize=3; 
-Event Model: ntree=1e4, sampsize=4
 
-```{r, EPacific EC ICI Model Figure,  echo=FALSE}
+
+Results for the EPacific EC (only) model are provided in @fig-epacific_EC_IPI (Detector Model: *sampsize* = 3, *ntree* = 10,000; Event Model: *sampsize* = 4, *ntree* = 10,000).
+
+```{r, EPacific EC IPI Model Figure,  echo=FALSE}
+#| label: fig-epacific_EC_IPI
+#| fig-cap: BANTER classification results from the EPacific dataset including echolocation pulses and inter-pulse interval (EC_IPI). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
+#| #| fig-width: 10
+#| fig-height: 10
+#| fig-align: center
+#| out-width: 100%
+#| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_confuseMatrix.png'))%>%
   image_border(color="#ffffff", geometry = "50x130")%>%
   image_annotate("a) Confusion Matrix", size=100, color = "black")

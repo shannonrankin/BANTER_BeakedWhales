@@ -2,14 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.1.189">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Shannon Rankin">
-<meta name="dcterms.date" content="2023-08-15">
+<meta name="dcterms.date" content="2023-08-28">
 
-<title>Supplement for Open-Source machine learning BANTER acoustic classification of a cryptic echolocating species</title>
+<title>Supplement for Open-Source machine learning BANTER acoustic classification of beaked whale echolocation pulses</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,7 +19,7 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
 </style>
@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Supplement for Open-Source machine learning BANTER acoustic classification of a cryptic echolocating species</h1>
+<h1 class="title">Supplement for Open-Source machine learning BANTER acoustic classification of beaked whale echolocation pulses</h1>
 </div>
 
 
@@ -64,9 +64,10 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 15, 2023</p>
+      <p class="date">August 28, 2023</p>
     </div>
   </div>
+  
     
   </div>
   
@@ -75,78 +76,81 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="natlantic" class="level1">
 <h1>NAtlantic</h1>
-<section id="ec-model" class="level2">
-<h2 class="anchored" data-anchor-id="ec-model">EC Model</h2>
-<p>Detector Model: ntree=1e4, sampsize=3; Event Model: ntree=1e4, sampsize=3</p>
-<div class="cell">
+<p>Results for the NAtlantic EC (only) model are provided in <a href="#fig-natlantic_EC">Figure&nbsp;1</a> (Detector Model: <em>sampsize</em> = 3, <em>ntree</em> = 10,000; Event Model: <em>sampsize</em> = 3, <em>ntree</em> = 10,000).</p>
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="Supplement_files/figure-html/NAtlantic%20EC%20Model%20Figure-1.png" class="img-fluid" width="4552"></p>
+<div id="fig-natlantic_EC" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Supplement_files/figure-html/fig-natlantic_EC-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: BANTER classification results from the NAtlantic dataset including echolocation pulses (EC). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.</figcaption>
+</figure>
 </div>
 </div>
-</section>
-<section id="ec_ici_alt-model" class="level2">
-<h2 class="anchored" data-anchor-id="ec_ici_alt-model">EC_ICI_ALT Model</h2>
-<p>Detector Model: ntree=1e4, sampsize=5; Event Model: ntree=1e5, sampsize=5</p>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="Supplement_files/figure-html/NAtlantic%20EC_ICI_ALT%20Model%20Figure-1.png" class="img-fluid" width="4552"></p>
 </div>
-</div>
-</section>
 </section>
 <section id="satlantic" class="level1">
 <h1>SAtlantic</h1>
-<section id="ec-model-1" class="level2">
-<h2 class="anchored" data-anchor-id="ec-model-1">EC Model</h2>
-<p>Detector Model: ntree=1e4, sampsize=8; Event Model: ntree=1e5, sampsize=1</p>
-<div class="cell">
+<p>Results for the SAtlantic EC (only) model are provided in <a href="#fig-satlantic_EC">Figure&nbsp;2</a> (Detector Model: <em>sampsize</em> = 8, <em>ntree</em> = 10,000; Event Model: <em>sampsize</em> = 1, <em>ntree</em> = 100,000).</p>
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="Supplement_files/figure-html/SAtlantic%20EC%20Model%20Figure-1.png" class="img-fluid" width="4552"></p>
+<div id="fig-satlantic_EC" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Supplement_files/figure-html/fig-satlantic_EC-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: BANTER classification results from the SAtlantic dataset including echolocation pulses (EC). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.</figcaption>
+</figure>
 </div>
 </div>
-</section>
-<section id="ec_ici_alt-model-1" class="level2">
-<h2 class="anchored" data-anchor-id="ec_ici_alt-model-1">EC_ICI_ALT Model</h2>
-<p>Detector Model: ntree=1e4, sampsize=4; Event Model: ntree=1e5, sampsize=3</p>
-<div class="cell">
+</div>
+<p>Results for the SAtlantic EC_IPI_ALT model are provided in <a href="#fig-satlantic_EC_IPI_ALT">Figure&nbsp;3</a> (Detector Model: <em>sampsize</em> = 4, <em>ntree</em> = 10,000; Event Model: <em>sampsize</em> = 3, <em>ntree</em> = 100,000).</p>
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="Supplement_files/figure-html/SAtlantic%20EC_ICI_ALT%20Model%20Figure-1.png" class="img-fluid" width="4552"></p>
+<div id="fig-satlantic_EC_IPI_ALT" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Supplement_files/figure-html/fig-satlantic_EC_IPI_ALT-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;3: BANTER classification results from the alternative SAtlantic dataset including echolocation pulses and inter-pulse interval with a large sampsize (EC_IPI_ALT). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.</figcaption>
+</figure>
 </div>
 </div>
-</section>
+</div>
 </section>
 <section id="hawaii" class="level1">
 <h1>Hawaii</h1>
-<section id="ec_ici-model" class="level2">
-<h2 class="anchored" data-anchor-id="ec_ici-model">EC_ICI Model</h2>
-<p>Detector Model: ntree=5e3, sampsize=5; Event Model: ntree=1e4, sampsize=4</p>
-<div class="cell">
+<p>Results for the Hawaii EC_IPI model are provided in <a href="#fig-hawaii_EC_IPI">Figure&nbsp;4</a> (Detector Model: <em>sampsize</em> = 5, <em>ntree</em> = 100,000; Event Model: <em>sampsize</em> = 4, <em>ntree</em> = 10,000).</p>
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="Supplement_files/figure-html/Hawaii%20EC_ICI%20Model%20Figure-1.png" class="img-fluid" width="4552"></p>
+<div id="fig-hawaii_EC_IPI" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Supplement_files/figure-html/fig-hawaii_EC_IPI-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;4: BANTER classification results from the Hawaii dataset including echolocation pulses and inter-pulse interval (EC_IPI). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.</figcaption>
+</figure>
 </div>
 </div>
-</section>
+</div>
 </section>
 <section id="epacific" class="level1">
 <h1>EPacific</h1>
-<section id="ec-model-2" class="level2">
-<h2 class="anchored" data-anchor-id="ec-model-2">EC Model</h2>
-<p>Detector Model: ntree=1e4, sampsize=3; Event Model: ntree=1e4, sampsize=4</p>
-<div class="cell">
+<p>Results for the EPacific EC (only) model are provided in <a href="#fig-epacific_EC">Figure&nbsp;5</a> (Detector Model: <em>sampsize</em> = 4, <em>ntree</em> = 10,000; Event Model: <em>sampsize</em> = 4, <em>ntree</em> = 10,000).</p>
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="Supplement_files/figure-html/EPacific%20EC%20Model%20Figure-1.png" class="img-fluid" width="4552"></p>
+<div id="fig-epacific_EC" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Supplement_files/figure-html/fig-epacific_EC-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;5: BANTER classification results from the EPacific dataset including echolocation pulses (EC). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.</figcaption>
+</figure>
 </div>
 </div>
-</section>
-<section id="ec_ici-model-1" class="level2">
-<h2 class="anchored" data-anchor-id="ec_ici-model-1">EC_ICI Model</h2>
-<p>Detector Model: ntree=1e4, sampsize=3; Event Model: ntree=1e4, sampsize=4</p>
-<div class="cell">
+</div>
+<p>Results for the EPacific EC (only) model are provided in <a href="#fig-epacific_EC_IPI">Figure&nbsp;6</a> (Detector Model: <em>sampsize</em> = 3, <em>ntree</em> = 10,000; Event Model: <em>sampsize</em> = 4, <em>ntree</em> = 10,000).</p>
+<div class="cell" data-layout-align="center">
 <div class="cell-output-display">
-<p><img src="Supplement_files/figure-html/EPacific%20EC%20ICI%20Model%20Figure-1.png" class="img-fluid" width="4552"></p>
+<div id="fig-epacific_EC_IPI" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Supplement_files/figure-html/fig-epacific_EC_IPI-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;6: BANTER classification results from the EPacific dataset including echolocation pulses and inter-pulse interval (EC_IPI). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.</figcaption>
+</figure>
 </div>
 </div>
-</section>
+</div>
 </section>
 
 </main>
@@ -178,9 +182,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -192,7 +210,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
     setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -228,24 +263,128 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
-    tippyHover(ref, function() {
-      var popup = window.document.createElement('div');
-      cites.forEach(function(cite) {
-        var citeDiv = window.document.createElement('div');
-        citeDiv.classList.add('hanging-indent');
-        citeDiv.classList.add('csl-entry');
-        var biblioDiv = window.document.getElementById('ref-' + cite);
-        if (biblioDiv) {
-          citeDiv.innerHTML = biblioDiv.innerHTML;
-        }
-        popup.appendChild(citeDiv);
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
       });
-      return popup.innerHTML;
-    });
+    }
   }
 });
 </script>

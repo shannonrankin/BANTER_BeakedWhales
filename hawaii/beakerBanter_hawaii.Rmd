@@ -251,14 +251,14 @@ Importance Heatmap
 
 ```{r, importance heat map, include=TRUE, results=FALSE}
 png(('../manuscript/manuscript_files/hawaii_ec_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
-plotImportance(banter_model_ec_RF, plot.type="heatmap")
+plotImportance(banter_model_ec_RF, plot.type="heatmap", n=10)
 dev.off()
-ec_hawaii_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap")
+ec_hawaii_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap", n=10)
 
 png(('../manuscript/manuscript_files/hawaii_ici_importance.png'), width = 30, height = 25, units = 'cm',  res = 300)
-plotImportance(banter_model_ici_RF, plot.type="heatmap")
+plotImportance(banter_model_ici_RF, plot.type="heatmap", n=10)
 dev.off()
-ici_hawaii_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap")
+ici_hawaii_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap", n=10)
 ```
 
 PlotVotes
