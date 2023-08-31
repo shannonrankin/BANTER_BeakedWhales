@@ -3,6 +3,7 @@ title: Supplement for Open-Source machine learning BANTER acoustic classificatio
 author: Shannon Rankin
 date: last-modified
 output: pdf
+#format: docx
 ---
 
 ```{r, load packages, include=FALSE}
