@@ -3,6 +3,7 @@
 # requires PAMpal 0.18.0 and PAMmisc 1.11.0
 
 # data must have GPS and species assigned
+#devtools::install_github('TaikiSan21/PAMpal')
 library(PAMpal)
 library(here)
 here()
@@ -32,7 +33,7 @@ library(PAMmisc)
 # to get figshare data you will need the article id and your personal token
 # i recommend storing your token in an external file instead of typing it in here
 # also DO NOT commit this file to any repository
-figToken <- readRDS(file = "epacific/figtoken.rds")
+figToken <- readRDS(file = "../shush/figtoken.rds")
 figId <- 22959786
 figshareData <- getFigshareInfo(figToken, figId)
 
@@ -49,4 +50,7 @@ checkAnnotation(anno)
 # add to acoustic study for storage
 data <- addAnnotation(data, anno)
 # this creates CSV ready for figshare, will also repeat messages from the check
-export_annomate(data, file=annoFile)
+#export_annomate(data, file=annoFile)#Needs a bug fix on PAMpal first
+#Run this temporarily until the bug is fixed:
+annoExport <- export_annomate(data)
+write.csv(annoExport, file=annoFile, row.names=FALSE)

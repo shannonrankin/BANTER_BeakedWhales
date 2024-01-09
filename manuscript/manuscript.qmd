@@ -152,6 +152,8 @@ Passive acoustic monitoring (PAM) has proven to be a valuable tool for studying 
 
 Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods [@macleod_beaked_2018]. However, beaked whales make stereotyped echolocation signals in the form of frequency-modulated (FM) pulses that have temporal and spatial characteristics that can be used to differentiate species [@baumann-pickering_species-specific_2013]. Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species [@barlow_acoustic-based_2022]; [@baumann-pickering_spatio-temporal_2014]; [@simonis_passive_2020]. Unfortunately, manual classification of beaked whale echolocation pulses requires analysis by trained analysts using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serves to improve the efficiency, reduce the subjectivity, and decrease the cost of analyzing large datasets.
 
+Advances in computing have led to a dramatic increase in the opportunities to use machine learning for bioacoustic classification tasks. In particular, use of deep neural networks show great promise for large datasets on a wide variety of taxa, including birds (cite), mammals (cite), insects (cite), reptiles (cite), fish (cite) and marine mammals (Franier et al. , Roman Ruiz et al 2023). Developing a neural network is non-trivial and has typically required extensive programming experience, but there are more and more tools that allow people to more readily use them (Kahl et al. 2021)\]. Neural networks typically require significant sample sizes, although there are increasingly new tools to enhance data or combined disparate datasets (Padovese et al. 2023, Nanni et al. 2020, Shorten and Khoshgoftaar 2019, Dufourq et al. 2022). \[There is a significant learning curve to understand how to properly apply and test neural network classification methods on a novel dataset\]. For many bioacoustic classification tasks, modification of existing machine learning methods may be sufficient and have a lower barrier to entry. Random Forest based acoustic classifiers have been found to be relatively easy, efficient, and effective approach to bioacoustic classification (Ross and Allen 2014, Lopez-Baucells et al. 2019).
+
 BANTER (**B**io-**A**coustic eve**NT** classifi**ER**) is a supervised machine learning method originally developed for species identification of dolphin signals from acoustic recordings [@rankin_acoustic_2017]. This hierarchical Random Forest [@breiman_random_2001] event classifier combines information from independent classification models for each call type (e.g., whistles, echolocation pulses, and burst pulses for the dolphin-based model) into a model classifying a full acoustic event, which is defined as a discrete collection of calls during an encounter. The event classifier uses the distribution of species assignment probabilities for each call type, along with any event-level metrics (such as call rate). BANTER is very flexible and can accommodate any number of measures from any number of detectors.
 
 While BANTER was designed to classify events by integrating information from multiple types of call detectors, relatively minor changes to a detector for a specific call type could yield different detector results. In the dolphin-based model [@rankin_acoustic_2017], settings for a whistle and moan detector were modified to improve performance at detecting burst pulses. This approach of applying output from multiple call detectors (of the same type but with different settings) suggests that perhaps BANTER could be used on species that only produce one call type (or where only one call type is to be analyzed), as long as the settings of the automated call detector were modified such that the results were different. This approach was successfully applied to classified echolocation pulses for narwhals and belugas [@zahn_acoustic_2021]. For species that primarily (or exclusively) produce echolocation pulses, BANTER may serve as an option for automated machine learning classification.
@@ -252,8 +254,6 @@ The authors would like to acknowledge the large number of scientists and shipboa
 
 # Figures and tables
 
-
-
 ```{r, natlantic}
 #| label: fig-natlantic
 #| fig-cap: BANTER classification results from the NAtlantic dataset including echolocation pulses and inter-pulse interval (EC_IPI). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
@@ -280,6 +280,7 @@ natlantic_ici_Figure <-image_append(c(prox, heat, vote))
 natlantic_ici_Figure<- image_append(c(confuse, natlantic_ici_Figure), stack=TRUE)
 print(natlantic_ici_Figure, info=FALSE)
 ```
+
 \newpage
 
 ```{r, satlantic}
@@ -308,7 +309,9 @@ satlantic_ici_Figure <-image_append(c(prox, heat, vote))
 satlantic_ici_Figure<- image_append(c(confuse, satlantic_ici_Figure), stack=TRUE)
 print(satlantic_ici_Figure, info=FALSE)
 ```
+
 \newpage
+
 ```{r, hawaii}
 #| label: fig-hawaii
 #| fig-cap: BANTER classification results from the Hawaii dataset (EC). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
@@ -335,7 +338,9 @@ hawaii_ec_Figure <-image_append(c(prox, heat, vote))
 hawaii_ec_Figure<- image_append(c(confuse, hawaii_ec_Figure), stack=TRUE)
 print(hawaii_ec_Figure, info=FALSE)
 ```
+
 \newpage
+
 ```{r, epacific-env}
 #| label: fig-epacific
 #| fig-cap: BANTER classification results from the EPacific dataset with environmental data (EC_IPI_ENV). Confusion matrix (a) provides the percent correct classification for each species (pct.correct), lower confidence intervals (LCI_0.95), upper confidence intervals (UCI_0.95), and priors (expected error rate). Proximity plot (b) for species events from BANTER model (central dot color represents true species identity; color of circle surrounding dot represents BANTER species classification). Heat map (c) for ranks of ten most important variables; colors scale from most important predictors (dark red) to least important predictors (dark blue). Vote Plot (d) shows the vote distribution for each event (vertical slice) for each species; distribution of votes by species is shown by their representative color.
@@ -362,5 +367,7 @@ epacific_env_Figure <-image_append(c(prox, heat, vote))
 epacific_env_Figure<- image_append(c(confuse, epacific_env_Figure), stack=TRUE)
 print(epacific_env_Figure, info=FALSE)
 ```
+
 \newpage
+
 # References {.unnumbered}

@@ -1,0 +1,52 @@
+---
+title: "DetailedManuscriptRevisions"
+author: "Shannon Rankin"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Instructions
+
+When resubmitting your manuscript, please carefully consider all issues mentioned in the reviewers' comments, outline every change made point by point, and provide suitable rebuttals for any comments not addressed.
+
+To submit your revised manuscript go to <https://www.editorialmanager.com/ecoinf/> and log in as an Author where you will see a menu item called 'Submission Needing Revision'.
+
+Please resubmit your manuscript by Feb 01, 2024.
+
+```{r cars}
+summary(cars)
+```
+
+## Requested Revisions
+
+-   Research Elements (optional)
+
+This journal encourages you to share research objects - including your raw data, methods, protocols, software, hardware and more -- which support your original research article in a Research Elements journal. Research Elements are open access, multidisciplinary, peer-reviewed journals which make the objects associated with your research more discoverable, trustworthy and promote replicability and reproducibility. As open access journals, there may be an Article Publishing Charge if your paper is accepted for publication. Find out more about the Research Elements journals at <https://www.elsevier.com/authors/tools-and-resources/research-elements-journals?dgcid=ec_em_research_elements_email>.
+
+-   the Introduction does not cover the pertinent literature and fails to highlight the novelty of your study. You are missing important work that has been published on the topic, including the journal Ecological Informatics. This is not a journal that solely focuses on the technical aspects of the published scholarship, we also want to see context, broader implications of your work, critical discussion of the uncertainties etc.
+
+    -   Add a paragraph about different approaches to automated classification, including CNNs, and what the strengths/limitations are. Discuss how even though some of these are really advancing and are becoming increasingly accessible to non-programmers, there is still a high barrier of entry. Banter is stupid easy & can be used by people with limited programming experience. but how does it was developed for working with multiple call types-- how does it work for just clicks?
+
+-   The quality of your Figures is highly problematic and needs to improve significantly.
+
+-   The Discussion is limited and fails to draw parallels with relevant studies from the peer-reviewed literature or put the presented results into the right context. You need to augment significantly the Discussion section in your paper and evaluate your work with reference to similar studies from the field of ecological informatics; several examples are also available in the journal Ecological Informatics.
+
+-   You are missing the Research Highlights, which should not exceed the maximum of 85 characters!!
+
+-   The justification for employing BANTER models is clear. **One could argue that more recent, deep learning-based methodologies could have been incorporated.** However, given that the detection performance in the study appears quite robust, the decision to utilize random forest detectors seems justified, as it doesn't seem to have adversely affected the results. [Discuss value of these methods given advances in CNNs, etc]
+
+-   Improve quality of ALL images
+
+    ## Detailed Responses and Rebuttals
+
+Research Highlights (maybe 3-5 highlights):
+
+-   [Banter is easy to use open source classifier for bioacoustic data to be used on multiple call types]
+
+-   [Banter can be applied to single call types when multiple detectors are used to identify those individual call types]
+
+-   [how well did banter do at classification?]
