@@ -50,3 +50,15 @@ Research Highlights (maybe 3-5 highlights):
 -   [Banter can be applied to single call types when multiple detectors are used to identify those individual call types]
 
 -   [how well did banter do at classification?]
+
+I would like to thank the reviewers and editors, especially the Associate Editor, for their review of our manuscript.
+
+-   ***Request to include expanded review of research on the research topic (Introduction).*** The associate editor requested that we expand our Introduction to include work that has been published on the topic. Our intention was to focus on a new application of an existing tool, and I assume that the associate editor would like increased consideration of deep learning methods for acoustic classification. To that end, I have included an additional paragraph in the introduction that includes consideration of these methods and a justification of why despite the incredibly advances in deep learning in recent years, consideration of machine learning methods (such as models based on Random Forest) may be preferred for some classification tasks.
+
+-   **Request to evaluate our results and draw parallels with relevant studies in the peer reviewed literature to provide important context (Discussion).** I included a brief comparison of our results to other machine learning methods to acoustically classify beaked whales, and highlighted how the number of classes and the sample size per class differentiates these studies. ***I also included a brief discussion of how the ease of use of BANTER allows biologists to readily adopt these methods, whereas the barrier to entry for most other machine learning models is steep.*** I hesitate to dive deeper into this discussion as these methods are evolving extremely rapidly, and while deep learning methods are rapidly advancing and are arguably the future of our science, at this point they have requirements that are beyond the scope of many scientists. Our focus is on how to use existing tools to provide reasonable results for imperfect data. I have added an additional statement encouraging the preparation of training sets for the eventual consideration in developing deep learning routines.
+
+-   Provide Context, broader implications of our work, and critical discussion of the uncertainties
+
+-   Improve resolution of Figures
+
+-   Include Research Highlights
