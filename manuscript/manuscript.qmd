@@ -129,7 +129,7 @@ date: last-modified
 bibliography: ../manuscript/bibliography.bib
 link-citations: TRUE
 format: docx
-  
+
 #  pdf: default
 #  elsevier-pdf:
 #    keep-tex: true
@@ -148,15 +148,15 @@ here()
 
 # Introduction
 
-Passive acoustic monitoring (PAM) has proven to be a valuable tool for studying populations of marine mammals [@parijs_management_2009]; however, the value of these studies depends on our ability to identify the sources of the sounds we are monitoring. Historically, experienced acousticians have manually identified stereotyped sounds that could reliably be attributed to a given species, based on their spectral or temporal characteristics [@baumann-pickering_species-specific_2013]; [@bittle_review_2013]; [@rankin_source_2005]; [@soldevilla_classification_2008]. However, the substantial increase in the quantity of recordings being made make it impossible for experienced acousticians to manually annotate it all. This has led to an increased need for the development of automated classification routines that can provide accurate species determinations from acoustic recordings.
+Passive acoustic monitoring (PAM) has proven to be a valuable tool for studying populations of marine mammals [@parijs_management_2009]; however, the value of these studies depends on our ability to identify the sources of the sounds we are monitoring. Historically, experienced acousticians have manually identified stereotyped sounds that could reliably be attributed to a given species, based on their spectral or temporal characteristics [@baumann-pickering_species-specific_2013; @bittle_review_2013; @rankin_source_2005; @soldevilla_classification_2008]. However, the substantial increase in the quantity of recordings being made make it impossible for experienced acousticians to manually annotate it all. This has led to an increased need for the development of automated classification routines that can provide accurate species determinations from acoustic recordings.
 
-Advances in computing have led to a dramatic increase in the opportunities to use machine learning for bioacoustic classification [@bianco_machine_2019, @mutanu_review_2022, @stowell_computational_2022]. In particular, use of deep neural networks show great promise for large datasets on a wide variety of taxa, including marine mammals [@frainer_automatic_2023, @frasier_automated_2017, @li_model-based_2020, @roman_ruiz_fin_2023, @zhong_beluga_2020]. Neural networks typically require significant sample sizes for all classes, although there are increasingly new tools to enhance data or combined disparate datasets [@dufourq_passive_2022, @nanni_data_2020, @nolasco_learning_2023, @padovese_adapting_2023, @shorten_survey_2019]. There is a significant learning curve to understand how to properly apply and test neural network classification methods on a novel dataset, although development of more user friendly tools are in development [@kahl_birdnet_2021, @kirsebom_meridian_2022]. Despite the great potential for deep learning methods, modification of existing machine learning methods with a lower barrier to entry may be sufficient for many bioacoustic classification tasks.
+Advances in computing have led to a dramatic increase in the opportunities to use machine learning for bioacoustic classification [@bianco_machine_2019; @mutanu_review_2022; @stowell_computational_2022]. In particular, use of deep neural networks show great promise for large datasets on a wide variety of taxa, including marine mammals [@frainer_automatic_2023; @frasier_automated_2017; @li_model-based_2020; @roman_ruiz_fin_2023; @zhong_beluga_2020]. Neural networks typically require significant sample sizes for all classes, although there are increasingly new tools to enhance data or combined disparate datasets [@dufourq_passive_2022; @nanni_data_2020; @nolasco_learning_2023; @padovese_adapting_2023; @shorten_survey_2019]. There is a significant learning curve to understand how to properly apply and test neural network classification methods on a novel dataset, although development of more user friendly tools are in development [@kahl_birdnet_2021; @kirsebom_meridian_2022]. Despite the great potential for deep learning methods, modification of existing machine learning methods with a lower barrier to entry may be sufficient for many bioacoustic classification tasks.
 
-Random Forest based acoustic classifiers have been found to be relatively easy, efficient, and effective approach to bioacoustic classification [@lopez-baucells_stronger_2019, @ross_random_2014]. BANTER (**B**io-**A**coustic eve**NT** classifi**ER**) is a hierarchical Random Forest [@breiman_random_2001] event classifier originally developed for species identification of dolphin signals from acoustic recordings [@rankin_acoustic_2017]. BANTER combines information from independent classification models for each call type (e.g., whistles, echolocation pulses, and burst pulses for the dolphin-based model) into a model classifying a full acoustic event, which is defined as a discrete collection of calls during an encounter. The event classifier uses the distribution of species assignment probabilities for each call type, along with any event-level metrics (such as call rate). BANTER is very flexible and can accommodate any number of measures from any number of detectors used to identify calls from any species. BANTER is easy to use and is readily available as a stand-alone R package [@archer_banter_2022].
+Random Forest based acoustic classifiers have been found to be relatively easy, efficient, and effective approach to bioacoustic classification [@lopez-baucells_stronger_2019; @ross_random_2014]. BANTER (**B**io-**A**coustic eve**NT** classifi**ER**) is a hierarchical Random Forest [@breiman_random_2001] event classifier originally developed for species identification of dolphin signals from acoustic recordings [@rankin_acoustic_2017]. BANTER combines information from independent classification models for each call type (e.g., whistles, echolocation pulses, and burst pulses for the dolphin-based model) into a model classifying a full acoustic event, which is defined as a discrete collection of calls during an encounter. The event classifier uses the distribution of species assignment probabilities for each call type, along with any event-level metrics (such as call rate). BANTER is very flexible and can accommodate any number of measures from any number of detectors used to identify calls from any species. BANTER is easy to use and is readily available as a stand-alone R package [@archer_banter_2022].
 
 While BANTER was designed to classify events by integrating information from multiple types of call detectors, relatively minor changes to a detector for a specific call type could yield different detector results. In the dolphin-based model [@rankin_acoustic_2017], settings for a whistle and moan detector were modified to improve performance at detecting burst pulses. This approach of applying output from multiple call detectors (of the same type but with different settings) suggests that perhaps BANTER could be used on species that only produce one call type (or where only one call type is to be analyzed), as long as the settings of the automated call detector were modified such that the results were different. This approach was successfully applied to classified echolocation pulses for narwhals and belugas [@zahn_acoustic_2021]. For species that primarily (or exclusively) produce echolocation pulses, BANTER may serve as an option for automated machine learning classification.
 
-Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods [@macleod_beaked_2018]. However, beaked whales make stereotyped echolocation signals in the form of frequency-modulated (FM) pulses that have temporal and spatial characteristics that can be used to differentiate species [@baumann-pickering_species-specific_2013]. Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species [@barlow_acoustic-based_2022]; [@baumann-pickering_spatio-temporal_2014]; [@simonis_passive_2020]. Unfortunately, manual classification of beaked whale echolocation pulses requires analysis by trained analysts using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serves to improve the efficiency, reduce the subjectivity, and decrease the cost of analyzing large datasets.
+Beaked whales are deep diving marine mammals found in offshore waters; their long dive intervals and cryptic surfacing behavior make them difficult to study using typical shipboard visual observation methods [@macleod_beaked_2018]. However, beaked whales make stereotyped echolocation signals in the form of frequency-modulated (FM) pulses that have temporal and spatial characteristics that can be used to differentiate species [@baumann-pickering_species-specific_2013]. Detection of beaked whale signals in large datasets is greatly expanding our understanding of their population structure and the potential impact of human activities on these species [@barlow_acoustic-based_2022; @baumann-pickering_spatio-temporal_2014; @simonis_passive_2020]. Unfortunately, manual classification of beaked whale echolocation pulses requires analysis by trained analysts using a number of visual aids to examine the call characteristics. Development of automated classification routines, if accurate, serves to improve the efficiency, reduce the subjectivity, and decrease the cost of analyzing large datasets.
 
 Here we applied BANTER acoustic classification to beaked whale detections from large acoustic datasets from the U.S. East Coast, Hawaii, and the U.S. West Coast. Acoustic data were analyzed by experienced acousticians to determine species identity, and these 'ground truth' classifications served as training data for the supervised BANTER models. Our goals were to identify an efficient and accurate automated approach to acoustic species identification of beaked whales, and to provide a framework for analysis that may serve for other PAM studies.
 
@@ -178,15 +178,15 @@ All acoustic recordings were analyzed using PAMGuard software (versions 2.00.15c
 
 Echolocation signals that were identified as frequency-modulated pulses from beaked whales were then linked to PAMGuard "events" by experienced acoustic analysts. Events included all the pulses that were close to each other in time, had similar spectral and waveform characteristics, and were received at consistent bearing angles. For NAtlantic and SAtlantic datasets, acoustic detections of beaked whales using towed hydrophone arrays were further subdivided into putative individuals by identification of consecutive pulses along the same bearing angle in the bearing time plot (see @deangelis_using_2017).
 
-Experienced acoustic analysts used multiple lines of evidence (PAMGuard click detector bearing time display, click waveform display, click spectrum, and wigner plots) to assess the species identity of the acoustic event. When the available characteristics were inconclusive, the species was considered an unidentified beaked whale. Data were saved within the PAMGuard database and binaries for downstream processing using the *PAMpal package* [@sakai_pampal_2021] in R v2022.07.02 [@r_core_team_r_2022].
+Experienced acoustic analysts used multiple lines of evidence (PAMGuard click detector bearing time display, click waveform display, click spectrum, and wigner plots) to assess the species identity of the acoustic event. When the available characteristics were inconclusive, the species was considered an unidentified beaked whale. Data were saved within the PAMGuard database and binaries for downstream processing using the *PAMpal package* [@sakai_pampal_2021] in R v2022.07.02 [@team_r_2013].
 
-Standard click metrics describing the spectral and temporal characteristics were measured from echolocation pulses using default values in *PAMpal* [@sakai_pampal_2023]. Inter-pulse interval (IPI) was calculated using the 'calculateICI' function in *PAMpal* and the mode of the IPI was identified for each beaked whale acoustic event. In addition, for the EPacific data, we used the 'matchEnvData' function in *PAMpal* to include ERDAPP environmental data [@simons_erddap_2022], including seafloor depth and seafloor gradient (both from erdSrtm30plusSeafloorGradient), as well as sea surface temperature (from jplMURSST41). A full consideration of environmental data for all regions was beyond the scope of this study.
+Standard click metrics describing the spectral and temporal characteristics were measured from echolocation pulses using default values in *PAMpal* [@sakai_pampal_2021]. Inter-pulse interval (IPI) was calculated using the 'calculateICI' function in *PAMpal* and the mode of the IPI was identified for each beaked whale acoustic event. In addition, for the EPacific data, we used the 'matchEnvData' function in *PAMpal* to include ERDAPP environmental data [@simons_erddap_2022], including seafloor depth and seafloor gradient (both from erdSrtm30plusSeafloorGradient), as well as sea surface temperature (from jplMURSST41). A full consideration of environmental data for all regions was beyond the scope of this study.
 
 Multiple models were created to better understand the value (and potential limitations) of the different suite of measurements. Models included standard click metrics (only) for all pulses in a beaked whale acoustic event (EC); the addition of IPI for each event (EC_IPI), and for the EPacific dataset we also included environmental variables (EC_IPI_ENV).
 
 ## BANTER Acoustic Classification
 
-BANTER models were created using the *banter* package [@archer_banter_2022] in R v2022.07.02 [@r_core_team_r_2022]. Output from PAMGuard click detector modules were used to create the BANTER detector models, for a total of 6 detector models (one for each click detector used). For each detector model, BANTER creates a mean of the species classification probabilities for each call type, which is applied to the BANTER event model (in conjunction with any event-level variables). A minimum of two events per species and the complete suite of variables (no missing data) were required for training and testing of the classification model. Event level variables included IPI and environmental variables (for the EPacific dataset). The Random Forest models that BANTER is based on are largely driven by two parameters, the number of trees in the forest (*ntree*) and the number of samples randomly drawn to build each tree (*sampsize*). Small values of *sampsize* were selected to improve computational performance, but large values of *ntree* were used to obtain models with stable classification results [@rankin_banter_2021]. Model results were summarized using the *rfpermute* package [@archer_rfpermute_2022].
+BANTER models were created using the *banter* package [@archer_banter_2022] in R v2022.07.02 [@team_r_2013]. Output from PAMGuard click detector modules were used to create the BANTER detector models, for a total of 6 detector models (one for each click detector used). For each detector model, BANTER creates a mean of the species classification probabilities for each call type, which is applied to the BANTER event model (in conjunction with any event-level variables). A minimum of two events per species and the complete suite of variables (no missing data) were required for training and testing of the classification model. Event level variables included IPI and environmental variables (for the EPacific dataset). The Random Forest models that BANTER is based on are largely driven by two parameters, the number of trees in the forest (*ntree*) and the number of samples randomly drawn to build each tree (*sampsize*). Small values of *sampsize* were selected to improve computational performance, but large values of *ntree* were used to obtain models with stable classification results [@rankin_banter_2021]. Model results were summarized using the *rfpermute* package [@archer_rfpermute_2022].
 
 # Results
 
@@ -226,7 +226,9 @@ There is considerable overlap in the primary feature space for all but BW43, as 
 
 # Discussion
 
-The results for the four study areas varied from a low of 88.7% correct classification in the SAtlantic dataset to a high of 97.5% correct classification in the NAtlantic dataset. All species in all datasets had classification rates well above those expected by chance; however Cuvier's (SAtlantic, Hawaii), Sowerby's (SAtlantic), and Gervais' beaked whales (NAtlantic) had classification rates below 90%. Other studies on machine learning acoustic classification of beaked whales have yielded stronger classification results, although these studies included fewer beaked whale species classes and much larger sample sizes for each species class \[@li_model-based_2020-1, @lebien_species-level_2018, @cohen_identification_2022\]. While there is great room for improvement in our models, and we suspect that modest increases in sample sizes for some species will result in significant improvements to the model results, it is likely that the low sample sizes presented in these datasets would be insufficient to develop and test deep learning models.
+Development of automated acoustic classifiers is critical for efficient analysis of large passive acoustic datasets; these classification routines require representative training data created by experienced acoustic analysts. While beaked whales species can be identified based on their stereotyped frequency-modulated echolocation clicks [@baumann-pickering_species-specific_2013], not all acoustic events include sounds that can be readily attributed to a specific species. Moreover, there are a number of beaked whales where little or nothing is known about their acoustic repertoire and new species have been detected in recent years [@deangelis_description_2018; @barlow_unique_2022]. Therefore, development of acoustic classifiers for beaked whales should accommodate small and/or unbalanced sample sizes and have sufficient flexibility to allow for variable call characteristics.
+
+The results for the four study areas varied from a low of 88.7% correct classification in the SAtlantic dataset to a high of 97.5% correct classification in the NAtlantic dataset. All species in all datasets had classification rates well above those expected by chance; however Cuvier's (SAtlantic, Hawaii), Sowerby's (SAtlantic), and Gervais' beaked whales (NAtlantic) had classification rates below 90%. Recent beaked whale classification studies using deep learning methods exhibit more robust results [@li_model-based_2020-1; @lebien_species-level_2018; @cohen_identification_2022; @ziegenhorn_discriminating_2022]; however, these models may not be appropriate for our dataset. Several studies included incomplete beaked whale species for the study area (@li_model-based_2020-1, @ziegenhorn_discriminating_2022) and all studies has sample large sample sizes (\>200) for each species class. The deep learning model developed by @cohen_identification_2022 included strong classification results with all beaked whale species found in our Atlantic models; however, it is unclear how this dataset trained on seafloor recorders would perform with towed array datasets. The BANTER models presented here only require a minimum of two samples per class and can therefore include all species within each region, making them useful to assess the presence of all beaked whales in the region. While deep learning methods may provide improved results once there are sufficient sample sizes for all relevant species within a study area, our results suggest that reasonable classification results can be obtained for all species using BANTER classification methods with as few as two samples per class.
 
 Several of our datasets included very low sample sizes for some species; however, low sample sizes did not always result in low classification scores. In the NAtlantic dataset, Sowerby's beaked whale (n=6) was correctly classified in 100% of the events, with strong assignment probabilities. The Sowerby's beaked whale events in the SAtlantic study and the Gervais' beaked whale events in the NAtlantic study consisted of weak classifications. This is likely due to both a small number of events (n = 2 for Sowerby's in SAtlantic and n = 4 for Gervais' in NAtlantic) combined with the small *sampsize* used in the BANTER model. In general, larger sample sizes should lead to improved overall classification results, and improved strength of these classification results (as indicated in the vote distributions).
 
@@ -236,9 +238,9 @@ Previous application of BANTER to dolphin species in the California Current foun
 
 Gervais' and True's beaked whales have similar pulse characteristics that make them difficult to differentiate and they require considerable expertise to classify manually [@deangelis_description_2018]. Our results suggest that BANTER may serve as an efficient and effective means of classifying and differentiating these two species. Despite modest sample sizes, Gervais' and True's beaked whales showed high classification scores in the SAtlantic (93.5% and 100%, respectively), and True's performed well in the NAtlantic. Unfortunately, we were unable to combine the Atlantic datasets (which would increase sample sizes of True's beaked whales) due to differences in hydrophone characteristics that resulted in differences in call metrics. Calibration of signals (to make them comparable) may allow for combining datasets to improve sample sizes.
 
-In addition to poor classification of Gervais' in the NAtlantic study area, the plot votes show that for one of the four events, only a few of the 100,000 trees 'voted' for Gervais', and the majority of the votes were for True's beaked whales. Analysts' notes indicated uncertainty in manual species classification of this event in this dataset. While small sample size can at times provide good classification scores, as we found for Sowerby's beaked whale in this SAtlantic dataset, they can be heavily influential if there are inaccuracies in the training data.
+In addition to poor classification of Gervais' in the NAtlantic study area, the plot votes show that for one of the four events, only a few of the 100,000 trees 'voted' for Gervais', and the majority of the votes were for True's beaked whales. Analysts' notes indicated uncertainty in manual species classification of this event in this dataset. While small sample size can at times provide good classification scores, as we found for Sowerby's beaked whale in this SAtlantic dataset, they can be heavily influenced by inaccuracies in the training data.
 
-These two examples of small sample sizes highlight a conflict in preferred protocol. Ideally, (1) all [species]{.underline} would be included in a classification model, so as to better represent the local species diversity, (2) all [events]{.underline} would ideally be included in the classification model, so as to better represent the variability found in the area, and (3) only confident 'ground truth' classifications would be considered in the training model. Unfortunately, in species where identity must be determined based on call characteristics (rather than visual confirmation of species identity in the field), it can sometimes be difficult to confidently determine species identity when calls are highly variable and do not include at least one call that provides high confidence of species identity. In the case of beaked whales, we recommend that training data include a high level of confidence for inclusion. This is especially critical for species with small sample sizes. An alternative is to require agreement from multiple analysts. This concern about accurate labeling of training data is further complicated by the potential existence of species that have not yet been identified. For example, [@barlow_unique_2022] recently discovered what appears to be a new species of beaked whale off Baja California, Mexico; this putative new species may have been detected but misclassified in other datasets (expert analysts did not identify these in the EPacific data presented here).
+These two examples of small sample sizes highlight a conflict in preferred protocol. Ideally, (1) all [species]{.underline} would be included in a classification model, so as to better represent the local species diversity, (2) all [events]{.underline} would ideally be included in the classification model, so as to better represent the variability found in the area, and (3) only confident 'ground truth' classifications would be considered in the training model. Unfortunately, in species where identity must be determined based on call characteristics (rather than visual confirmation of species identity in the field), it can sometimes be difficult to confidently determine species identity when calls are highly variable and do not include at least one call that provides high confidence of species identity. In the case of beaked whales, we recommend that training data include a high level of confidence for inclusion. This is especially critical for species with small sample sizes. An alternative is to require agreement from multiple analysts. This concern about accurate labeling of training data is further complicated by the potential existence of species that have not yet been identified. For example, @barlow_unique_2022 recently discovered what appears to be a new species of beaked whale off Baja California, Mexico; this putative new species may have been detected but misclassified in other datasets (expert analysts did not identify these in the EPacific data presented here).
 
 Inter-pulse interval (IPI) was found to be the most important variable for NAtlantic and EPacific, and IPI was the fourth and fifth ranked variables for SAtlantic (see importance heat maps for each survey area). While the addition of IPI did not improve results for data from Hawaii, results were similar and IPI ranked #9 in importance for the Hawaii study area. @baumann-pickering_species-specific_2013 showed an overlap in the IPI between Cuvier's and Blainville's beaked whales, but a strong difference in IPI between these species and Cross Seamount beaked whales. It is possible that classification of these species could be improved by refining an event to annotation at the individual level, as was done with the NAtlantic and SAtlantic datasets. Subdividing pulse trains into individuals in PAMGuard is time consuming, but alternative options include consideration of the PAMGuard click train detector module as an additional first stage detector in BANTER, or by developing a similar function in R to apply to events.
 
@@ -246,13 +248,16 @@ For this study, only a few simple environmental features were considered for one
 
 While BANTER provides an efficient and consistent approach to classification, there are significant limitations that must be considered. BANTER is a supervised machine learning tool and requires reliable training data for success. Training data should consist of labels with strong confidence in species identity (ideally determined by agreement from more than one analyst) and sample sizes should be large enough to explain the natural variability in the data.
 
-The workflow presented here provides a highly automated approach to detection of acoustic events (PAMGuard), integration of environmental data (PAMpal), and acoustic event classification (BANTER). These methods significantly reduce manual analysis, provide more consistent classification results with fewer biases, and provide an estimate of classification error. The greatest improvement to classification results for beaked whales would likely result from improved sample sizes, and examination of individuals to accurately measure IPI. Consideration of additional detectors (e.g., matched filter detector, click train detector) or additional environmental variables may further improve classification results. Improved alignment of detection methods across studies (i.e., definition of events, hydrophone calibration) may allow for combining data within geographic regions to improve assessments within regions for all species, and across regions for species with global distributions, such as Cuvier's beaked whales. These highly automated methods may allow for analysis of data across large spatial and temporal scales to address large ecological and population level questions.
+Until deep learning methods become more accessible and practical for applications involving rare species and low sample sizes, or their applicability across recording platforms can be guaranteed, machine learning approaches such as BANTER can serve as an accessible means of developing acoustic classifiers for complicated datasets. The workflow presented here provides a highly automated approach to detection of acoustic events (PAMGuard), integration of environmental data (PAMpal), and acoustic event classification (BANTER). These methods significantly reduce manual analysis, provide more consistent classification results with fewer biases, and provide an estimate of classification error. The greatest improvement to classification results for beaked whales would likely result from improved sample sizes, and examination of individuals to accurately measure IPI. Consideration of additional detectors (e.g., matched filter detector, click train detector) or additional environmental variables may further improve classification results. Improved alignment of detection methods across studies (i.e., definition of events, hydrophone calibration) may allow for combining data within geographic regions to improve assessments within regions for all species, and across regions for species with global distributions, such as Cuvier's beaked whales. These highly automated methods may allow for analysis of data across large spatial and temporal scales to address large ecological and population level questions.
 
 # Acknowledgements
 
-The authors would like to acknowledge the large number of scientists and shipboard crew who were responsible for data collection during multiple large scale studies. Thanks to Liam Mueller-Brennan for their help with data analysis. Sea surface temperature data were provided by JPL under support by the NASA MEaSUREs program. Funding for data collection and analysis were provided by the U.S. Navy, the Bureau of Ocean Energy Management, and the National Oceanographic and Atmospheric Administration. The AMAPPS study (NAtlantic/SAtantic) was funded in part by the U.S. Department of the Interior, Bureau of Ocean Energy Management, Environmental Studies Program, Washington, DC, through Inter-Agency Agreement Number M10PG00075 with the National Marine Fisheries Service as the Atlantic Marine Assessment Program for Protected Species. The HICEAS 2017 Survey (Hawaii) was funded by Bureau of Ocean Energy Management under (IAA M17PG00024) and NMFS Pacific Islands Fisheries Science Center. The CCES Survey (EPacific) was funded by Bureau of Ocean Energy Management (No. M17PG00025), U.S. Navy Pacific Fleet Environmental Readiness Division (IAA No. N00070-18-MP-4C560) and Chief of Naval Operations N45, and Southwest Fisheries Science Center. The manuscript was improved thanks to reviews from Cory Hom-Weaver.
+The authors would like to acknowledge the large number of scientists and shipboard crew who were responsible for data collection during multiple large scale studies. Thanks to Liam Mueller-Brennan for their help with data analysis. Sea surface temperature data were provided by JPL under support by the NASA MEaSUREs program. Funding for data collection and analysis were provided by the U.S. Navy, the Bureau of Ocean Energy Management, and the National Oceanographic and Atmospheric Administration. The AMAPPS study (NAtlantic/SAtantic) was funded in part by the U.S. Department of the Interior, Bureau of Ocean Energy Management, Environmental Studies Program, Washington, DC, through Inter-Agency Agreement Number M10PG00075 with the National Marine Fisheries Service as the Atlantic Marine Assessment Program for Protected Species. The HICEAS 2017 Survey (Hawaii) was funded by Bureau of Ocean Energy Management under (IAA M17PG00024) and NMFS Pacific Islands Fisheries Science Center. The CCES Survey (EPacific) was funded by Bureau of Ocean Energy Management (No. M17PG00025), U.S. Navy Pacific Fleet Environmental Readiness Division (IAA No. N00070-18-MP-4C560) and Chief of Naval Operations N45, and Southwest Fisheries Science Center. The manuscript was improved thanks to reviews from Cory Hom-Weaver and an anonymous reviewer.
 
+
+{{< pagebreak >}}
 # Figures and tables
+
 
 ```{r, natlantic}
 #| label: fig-natlantic
@@ -260,28 +265,28 @@ The authors would like to acknowledge the large number of scientists and shipboa
 #| fig-width: 10
 #| fig-height: 10
 #| fig-align: center
-#| out-width: 100%
+#| out-width: 200%
 #| echo: false
 confuse <- magick::image_read('manuscript_files/natlantic_ici_confuseMatrix.png')%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read('manuscript_files/natlantic_ici_votes.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read('manuscript_files/natlantic_ici_proximity.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read('manuscript_files/natlantic_ici_importance.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("c) Importance Heat Map", size=100, color = "black")
+  image_annotate("c) Importance Heat Map", size=120, color = "black")
   
 natlantic_ici_Figure <-image_append(c(prox, heat, vote))
 natlantic_ici_Figure<- image_append(c(confuse, natlantic_ici_Figure), stack=TRUE)
 print(natlantic_ici_Figure, info=FALSE)
 ```
 
-\newpage
+{{< pagebreak >}}
 
 ```{r, satlantic}
 #| label: fig-satlantic
@@ -289,28 +294,29 @@ print(natlantic_ici_Figure, info=FALSE)
 #| fig-width: 10
 #| fig-height: 10
 #| fig-align: center
-#| out-width: 100%
+#| out-width: 200%
 #| echo: false
 confuse <- magick::image_read('manuscript_files/satlantic_ici_confuseMatrix.png')%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read('manuscript_files/satlantic_ici_votes.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read('manuscript_files/satlantic_ici_proximity.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read('manuscript_files/satlantic_ici_importance.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  #image_border(color="#ffffff", geometry = "540x52")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("c) Importance Heat Map", size=100, color = "black")
+  image_annotate("c) Importance Heat Map", size=120, color = "black")
   
 satlantic_ici_Figure <-image_append(c(prox, heat, vote))
 satlantic_ici_Figure<- image_append(c(confuse, satlantic_ici_Figure), stack=TRUE)
 print(satlantic_ici_Figure, info=FALSE)
 ```
 
-\newpage
+{{< pagebreak >}}
 
 ```{r, hawaii}
 #| label: fig-hawaii
@@ -318,28 +324,28 @@ print(satlantic_ici_Figure, info=FALSE)
 #| fig-width: 10
 #| fig-height: 10
 #| fig-align: center
-#| out-width: 100%
+#| out-width: 200%
 #| echo: false
 confuse <- magick::image_read('manuscript_files/hawaii_ec_confuseMatrix.png')%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read('manuscript_files/hawaii_ec_votes.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read('manuscript_files/hawaii_ec_proximity.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read('manuscript_files/hawaii_ec_importance.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("c) Importance Heat Map", size=100, color = "black")
+  image_annotate("c) Importance Heat Map", size=120, color = "black")
   
 hawaii_ec_Figure <-image_append(c(prox, heat, vote))
 hawaii_ec_Figure<- image_append(c(confuse, hawaii_ec_Figure), stack=TRUE)
 print(hawaii_ec_Figure, info=FALSE)
 ```
 
-\newpage
+{{< pagebreak >}}
 
 ```{r, epacific-env}
 #| label: fig-epacific
@@ -347,27 +353,27 @@ print(hawaii_ec_Figure, info=FALSE)
 #| fig-width: 10
 #| fig-height: 10
 #| fig-align: center
-#| out-width: 100%
+#| out-width: 200%
 #| echo: false
 confuse <- magick::image_read('manuscript_files/epacific_env_confuseMatrix.png')%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read('manuscript_files/epacific_env_votes.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read('manuscript_files/epacific_env_proximity.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read('manuscript_files/epacific_env_importance.png')%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("c) Importance Heat Map", size=100, color = "black")
+  image_annotate("c) Importance Heat Map", size=120, color = "black")
   
 epacific_env_Figure <-image_append(c(prox, heat, vote))
 epacific_env_Figure<- image_append(c(confuse, epacific_env_Figure), stack=TRUE)
 print(epacific_env_Figure, info=FALSE)
 ```
 
-\newpage
+{{< pagebreak >}}
 
 # References {.unnumbered}

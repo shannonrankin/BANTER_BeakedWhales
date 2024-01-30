@@ -33,7 +33,7 @@ Start by loading the required packages
 
 ```{r, load packages, message=FALSE}
 library("easypackages")
-libraries("PAMpal", "banter", "rfPermute", "readxl", "stringr", "dplyr", "kableExtra", "magick", "magrittr", "here")
+libraries("PAMpal", "banter", "rfPermute", "readxl", "stringr", "dplyr", "kableExtra", "magick", "magrittr", "ggplot2", "here")
 here()
 ```
 
@@ -360,46 +360,78 @@ Proximity Plot
 
 ```{r, proximity plot, include=TRUE, results=FALSE}
 png(('../manuscript/manuscript_files/natlantic_ec_proximity.png'), width = 20, height = 20, units = 'cm', res = 300)
-natlantic_ec_proximityPlot <- plotProximity(banter_model_ec_RF)
+ec_natlantic_proximityPlot <- plotProximity(banter_model_ec_RF, plot = FALSE)
+ec_natlantic_proximityPlot$g + theme(axis.text = element_text(size = 16),
+                                     axis.title = element_text(size = 16),
+                                     legend.text = element_text(size = 16)
+                                     )
 dev.off()
-natlantic_ec_proximityPlot <- plotProximity(banter_model_ec_RF)
+natlantic_ec_proximityPlot <- plotProximity(banter_model_ec_RF, label.size=16)
 
 png(('../manuscript/manuscript_files/natlantic_ici_proximity.png'), width = 20, height = 20, units = 'cm', res = 300)
-ici_natlantic_proximityPlot <- plotProximity(banter_model_ici_RF)
+ici_natlantic_proximityPlot <- plotProximity(banter_model_ici_RF, plot = FALSE)
+ici_natlantic_proximityPlot$g + theme(axis.text = element_text(size = 16),
+                                     axis.title = element_text(size = 16),
+                                     legend.text = element_text(size = 16)
+                                     )
 dev.off()
 ici_natlantic_proximityPlot <- plotProximity(banter_model_ici_RF)
 
 png(('../manuscript/manuscript_files/natlantic_env_proximity.png'), width = 20, height = 20, units = 'cm', res = 300)
-env_natlantic_proximityPlot <- plotProximity(banter_model_env_RF)
+env_natlantic_proximityPlot <- plotProximity(banter_model_env_RF, plot = FALSE)
+env_natlantic_proximityPlot$g + theme(axis.text = element_text(size = 16),
+                                     axis.title = element_text(size = 16),
+                                     legend.text = element_text(size = 16)
+                                     )
 dev.off()
-env_natlantic_proximityPlot <- plotProximity(banter_model_env_RF)
+env_natlantic_proximityPlot <- plotProximity(banter_model_env_RF, label.size=16)
 
 png(('../manuscript/manuscript_files/natlantic_alt_proximity.png'), width = 20, height = 20, units = 'cm', res = 300)
-alt_natlantic_proximityPlot <- plotProximity(banter_model_alt_RF)
+alt_natlantic_proximityPlot <- plotProximity(banter_model_alt_RF, plot = FALSE)
+alt_natlantic_proximityPlot$g + theme(axis.text = element_text(size = 16),
+                                     axis.title = element_text(size = 16),
+                                     legend.text = element_text(size = 16)
+                                     )
 dev.off()
-alt_natlantic_proximityPlot <- plotProximity(banter_model_alt_RF)
+alt_natlantic_proximityPlot <- plotProximity(banter_model_alt_RF, label.size=16)
 ```
 
 Importance Heatmap
 
 ```{r, importance heat map, include=TRUE, results=FALSE}
 png(('../manuscript/manuscript_files/natlantic_ec_importance.png'), width = 30, height = 25, units = 'cm', res = 300)
-plotImportance(banter_model_ec_RF, plot.type="heatmap", n=10)
+ec_natlantic_plotImportance <- plotImportance(banter_model_ec_RF, plot.type="heatmap",n=10, plot = FALSE)
+ec_natlantic_plotImportance + theme(axis.text = element_text(size = 16),
+                                      axis.text.x = element_text(angle = -30, vjust = 1, hjust = 0),
+                                      legend.text = element_text(size = 16)
+                                      )
 dev.off()
 natlantic_ec_importance <- plotImportance(banter_model_ec_RF, plot.type="heatmap", n=10)
 
 png(('../manuscript/manuscript_files/natlantic_ici_importance.png'), width = 30, height = 25, units = 'cm', res = 300)
-plotImportance(banter_model_ici_RF, plot.type="heatmap", n=10)
+ici_natlantic_plotImportance <- plotImportance(banter_model_ici_RF, plot.type="heatmap",n=10, plot = FALSE)
+ici_natlantic_plotImportance + theme(axis.text = element_text(size = 16),
+                                      axis.text.x = element_text(angle = -30, vjust = 1, hjust = 0),
+                                      legend.text = element_text(size = 16)
+                                      )
 dev.off()
 ici_natlantic_importance <- plotImportance(banter_model_ici_RF, plot.type="heatmap", n=10)
 
 png(('../manuscript/manuscript_files/natlantic_env_importance.png'), width = 30, height = 25, units = 'cm', res = 300)
-plotImportance(banter_model_env_RF, plot.type="heatmap", n=10)
+env_natlantic_plotImportance <- plotImportance(banter_model_env_RF, plot.type="heatmap",n=10, plot = FALSE)
+env_natlantic_plotImportance + theme(axis.text = element_text(size = 16),
+                                      axis.text.x = element_text(angle = -30, vjust = 1, hjust = 0),
+                                      legend.text = element_text(size = 16)
+                                      )
 dev.off()
 env_natlantic_importance <- plotImportance(banter_model_env_RF, plot.type="heatmap", n=10)
 
 png(('../manuscript/manuscript_files/natlantic_alt_importance.png'), width = 30, height = 25, units = 'cm', res = 300)
-plotImportance(banter_model_alt_RF, plot.type="heatmap", n=10)
+alt_natlantic_plotImportance <- plotImportance(banter_model_alt_RF, plot.type="heatmap",n=10, plot = FALSE)
+alt_natlantic_plotImportance + theme(axis.text = element_text(size = 16),
+                                      axis.text.x = element_text(angle = -30, vjust = 1, hjust = 0),
+                                      legend.text = element_text(size = 16)
+                                      )
 dev.off()
 alt_natlantic_importance <- plotImportance(banter_model_alt_RF, plot.type="heatmap", n=10)
 ```
@@ -408,22 +440,38 @@ PlotVotes
 
 ```{r, plot votes, include=TRUE, results=FALSE}
 png(('../manuscript/manuscript_files/natlantic_ec_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
-plotVotes(banter_model_ec_RF)
+ec_natlantic_plotVotes <- plotVotes(banter_model_ec_RF, plot = FALSE)
+ec_natlantic_plotVotes + theme(axis.text = element_text(size = 16),
+                                     axis.title = element_text(size = 16),
+                                     legend.text = element_text(size = 16)
+                                     )
 dev.off()
 natlantic_ec_votes <- plotVotes(banter_model_ec_RF)
 
 png(('../manuscript/manuscript_files/natlantic_ici_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
-plotVotes(banter_model_ici_RF)
+ici_natlantic_plotVotes <- plotVotes(banter_model_ici_RF, plot = FALSE)
+ici_natlantic_plotVotes + theme(axis.text = element_text(size = 16),
+                                     axis.title = element_text(size = 16),
+                                     legend.text = element_text(size = 16)
+                                     )
 dev.off()
 ici_natlantic_votes <- plotVotes(banter_model_ici_RF)
 
 png(('../manuscript/manuscript_files/natlantic_env_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
-plotVotes(banter_model_env_RF)
+env_natlantic_plotVotes <- plotVotes(banter_model_env_RF, plot = FALSE)
+env_natlantic_plotVotes + theme(axis.text = element_text(size = 16),
+                                     axis.title = element_text(size = 16),
+                                     legend.text = element_text(size = 16)
+                                     )
 dev.off()
 env_natlantic_votes <- plotVotes(banter_model_env_RF)
 
 png(('../manuscript/manuscript_files/natlantic_alt_votes.png'), width = 20, height = 20, units = 'cm',  res = 300)
-plotVotes(banter_model_alt_RF)
+alt_natlantic_plotVotes <- plotVotes(banter_model_alt_RF, plot = FALSE)
+alt_natlantic_plotVotes + theme(axis.text = element_text(size = 16),
+                                     axis.title = element_text(size = 16),
+                                     legend.text = element_text(size = 16)
+                                     )
 dev.off()
 alt_natlantic_votes <- plotVotes(banter_model_alt_RF)
 ```
@@ -440,18 +488,18 @@ plotPredictedProbs(banter_model_alt_RF, bins=30, plot=TRUE)
 Create Figure for Publication
 ```{r, Publication Figure, include=TRUE}
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=300, color = "black")
+  image_border(color="#ffffff", geometry = "50x200")%>%
+  image_annotate("a) Confusion Matrix", size=150, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=300, color = "black")
+  image_annotate("d) Vote Plot", size=150, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=300, color = "black")
+  image_annotate("b) Proximity Plot", size=150, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "270x200")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=300, color = "black")
+  image_annotate("d) Importance Heat Map", size=150, color = "black")
   
 natlantic_ec_Figure <-image_append(c(prox, heat, vote))
 natlantic_ec_Figure<- image_append(c(confuse, natlantic_ec_Figure), stack=TRUE)
@@ -459,18 +507,18 @@ image_write(natlantic_ec_Figure, path = here('manuscript', 'manuscript_files','n
 print(natlantic_ec_Figure, info=FALSE)
 
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ici_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=300, color = "black")
+  image_border(color="#ffffff", geometry = "50x200")%>%
+  image_annotate("a) Confusion Matrix", size=150, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ici_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=300, color = "black")
+  image_annotate("d) Vote Plot", size=150, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ici_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=300, color = "black")
+  image_annotate("b) Proximity Plot", size=150, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ici_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "270x200")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=300, color = "black")
+  image_annotate("d) Importance Heat Map", size=150, color = "black")
   
 natlantic_ici_Figure <-image_append(c(prox, heat, vote))
 natlantic_ici_Figure<- image_append(c(confuse, natlantic_ici_Figure), stack=TRUE)
@@ -478,18 +526,18 @@ image_write(natlantic_ici_Figure, path = here('manuscript', 'manuscript_files','
 print(natlantic_ici_Figure, info=FALSE)
 
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_env_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=300, color = "black")
+  image_border(color="#ffffff", geometry = "50x200")%>%
+  image_annotate("a) Confusion Matrix", size=150, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_env_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=300, color = "black")
+  image_annotate("d) Vote Plot", size=150, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_env_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=300, color = "black")
+  image_annotate("b) Proximity Plot", size=150, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_env_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "270x200")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=300, color = "black")
+  image_annotate("d) Importance Heat Map", size=150, color = "black")
   
 natlantic_env_Figure <-image_append(c(prox, heat, vote))
 natlantic_env_Figure<- image_append(c(confuse, natlantic_env_Figure), stack=TRUE)
@@ -497,18 +545,18 @@ image_write(natlantic_env_Figure, path = here('manuscript', 'manuscript_files','
 print(natlantic_env_Figure, info=FALSE)
 
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=300, color = "black")
+  image_border(color="#ffffff", geometry = "50x200")%>%
+  image_annotate("a) Confusion Matrix", size=150, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_votes.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=300, color = "black")
+  image_annotate("d) Vote Plot", size=150, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_proximity.png'))%>%
   image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=300, color = "black")
+  image_annotate("b) Proximity Plot", size=150, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_alt_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "270x200")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=300, color = "black")
+  image_annotate("d) Importance Heat Map", size=150, color = "black")
   
 natlantic_alt_Figure <-image_append(c(prox, heat, vote))
 natlantic_alt_Figure<- image_append(c(confuse, natlantic_alt_Figure), stack=TRUE)

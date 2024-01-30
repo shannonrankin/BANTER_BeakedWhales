@@ -5,60 +5,36 @@ date: "`r Sys.Date()`"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+To the Editors of Ecological Informatics:
 
-## Instructions
+Thank you for your consideration and review of my research article submission entitled "Open-Source machine learning BANTER acoustic classification of beaked whale echolocation pulses". I appreciate your time and the feedback to improve this manuscript for publication. We agree with all comments and suggestions provided by the reviewers/editors, and we provide an explanation of how we addressed each comment.
 
-When resubmitting your manuscript, please carefully consider all issues mentioned in the reviewers' comments, outline every change made point by point, and provide suitable rebuttals for any comments not addressed.
+-   ***Request to include 3-5 Research Highlights (optional).*** We suggest the following Research Highlights:
 
-To submit your revised manuscript go to <https://www.editorialmanager.com/ecoinf/> and log in as an Author where you will see a menu item called 'Submission Needing Revision'.
+    -   BANTER is an open source, accessible machine learning classifier for data with multiple call types
 
-Please resubmit your manuscript by Feb 01, 2024.
+    -   BANTER can use multiple detectors on single call types for acoustic event classification
 
-```{r cars}
-summary(cars)
-```
+    -   BANTER can classify beaked whale species with relatively low sample sizes
 
-## Requested Revisions
+    -   BANTER is easy to use and can be easily adopted to address current classification needs
 
--   Research Elements (optional)
+-   ***Request to include expanded review of research on the research topic (Introduction).*** Our intention was to focus on a new application of an existing tool, and I assume the request was in relation to relatively new deep learning methods for acoustic classification. To that end, I have included an additional Introduction paragraph that includes consideration of these methods and a justification of why despite the incredible advances in deep learning in recent years, consideration of machine learning methods (such as models based on Random Forest) may be preferred for some classification tasks.
 
-This journal encourages you to share research objects - including your raw data, methods, protocols, software, hardware and more -- which support your original research article in a Research Elements journal. Research Elements are open access, multidisciplinary, peer-reviewed journals which make the objects associated with your research more discoverable, trustworthy and promote replicability and reproducibility. As open access journals, there may be an Article Publishing Charge if your paper is accepted for publication. Find out more about the Research Elements journals at <https://www.elsevier.com/authors/tools-and-resources/research-elements-journals?dgcid=ec_em_research_elements_email>.
+-   ***Request to evaluate our results and draw parallels with relevant studies in the peer reviewed literature to provide important context (Discussion)*****.** In order to provide additional context in the discussion without losing sight of the more narrow goals of this study, I focused on discussion points related specifically to acoustic classification of beaked whales. To that end, I first added a paragraph outlining some specific needs as it relates to acoustic classification of beaked whales. I then provided a comparison of our general results to those provided by other automated methods for acoustic classification of beaked whales providing context regarding the specific needs outlined in the previous paragraph (most importantly, considering all relevant species in a region, including species with low sample sizes). Finally, I modified the final paragraph to acknowledge that the limitations in deep learning methods are most likely temporary, and that the methods provided here can be readily adopted now to meet existing acoustic classification needs.
 
--   the Introduction does not cover the pertinent literature and fails to highlight the novelty of your study. You are missing important work that has been published on the topic, including the journal Ecological Informatics. This is not a journal that solely focuses on the technical aspects of the published scholarship, we also want to see context, broader implications of your work, critical discussion of the uncertainties etc.
+-   ***Improve Resolution of Figures.*** I have increased the font size on most of the graphs, which required introducing an angle for the x-axis for the heatmaps (c) for all Figures. The page layout for these figures was shifted to Landscape to allow for the wide image format. If additional modifications (minor or major) are needed, these can be accommodated.
 
-    -   Add a paragraph about different approaches to automated classification, including CNNs, and what the strengths/limitations are. Discuss how even though some of these are really advancing and are becoming increasingly accessible to non-programmers, there is still a high barrier of entry. Banter is stupid easy & can be used by people with limited programming experience. but how does it was developed for working with multiple call types-- how does it work for just clicks?
+-   ***Research Elements (optional).*** This project is a collaboration, and as such not all researchers are fully prepared to make their data publicly available. The data provided my my research lab (epacific in this study) will be publicly available on Figshare (I am only waiting for final acceptance of this paper). This manuscript, and the associated data products will be made publicly available on github (if not in whole, at least the epacific component). We strongly believe in Open Science and strive towards that goal.
 
--   The quality of your Figures is highly problematic and needs to improve significantly.
+I hope that these revisions are acceptable, and that you accept this draft manuscript for publication. If you require additional revisions, I will be happy to consider them. I greatly appreciate you and your team for your time and energy considering this manuscript for publication.
 
--   The Discussion is limited and fails to draw parallels with relevant studies from the peer-reviewed literature or put the presented results into the right context. You need to augment significantly the Discussion section in your paper and evaluate your work with reference to similar studies from the field of ecological informatics; several examples are also available in the journal Ecological Informatics.
+Sincerely,
 
--   You are missing the Research Highlights, which should not exceed the maximum of 85 characters!!
+Shannon Rankin
 
--   The justification for employing BANTER models is clear. **One could argue that more recent, deep learning-based methodologies could have been incorporated.** However, given that the detection performance in the study appears quite robust, the decision to utilize random forest detectors seems justified, as it doesn't seem to have adversely affected the results. [Discuss value of these methods given advances in CNNs, etc]
+Wildlife Research Biologist
 
--   Improve quality of ALL images
+Southwest Fisheries Science Center
 
-    ## Detailed Responses and Rebuttals
-
-Research Highlights (maybe 3-5 highlights):
-
--   [Banter is easy to use open source classifier for bioacoustic data to be used on multiple call types]
-
--   [Banter can be applied to single call types when multiple detectors are used to identify those individual call types]
-
--   [how well did banter do at classification?]
-
-I would like to thank the reviewers and editors, especially the Associate Editor, for their review of our manuscript.
-
--   ***Request to include expanded review of research on the research topic (Introduction).*** The associate editor requested that we expand our Introduction to include work that has been published on the topic. Our intention was to focus on a new application of an existing tool, and I assume that the associate editor would like increased consideration of deep learning methods for acoustic classification. To that end, I have included an additional paragraph in the introduction that includes consideration of these methods and a justification of why despite the incredibly advances in deep learning in recent years, consideration of machine learning methods (such as models based on Random Forest) may be preferred for some classification tasks.
-
--   **Request to evaluate our results and draw parallels with relevant studies in the peer reviewed literature to provide important context (Discussion).** I included a brief comparison of our results to other machine learning methods to acoustically classify beaked whales, and highlighted how the number of classes and the sample size per class differentiates these studies. ***I also included a brief discussion of how the ease of use of BANTER allows biologists to readily adopt these methods, whereas the barrier to entry for most other machine learning models is steep.*** I hesitate to dive deeper into this discussion as these methods are evolving extremely rapidly, and while deep learning methods are rapidly advancing and are arguably the future of our science, at this point they have requirements that are beyond the scope of many scientists. Our focus is on how to use existing tools to provide reasonable results for imperfect data. I have added an additional statement encouraging the preparation of training sets for the eventual consideration in developing deep learning routines.
-
--   Provide Context, broader implications of our work, and critical discussion of the uncertainties
-
--   Improve resolution of Figures
-
--   Include Research Highlights
+NOAA Fisheries
