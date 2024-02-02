@@ -1,9 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
-
 **BANTER for Beaked Whales**
 
 ***Research Compendium*** for Rankin, et al (in review at Ecological
