@@ -129,15 +129,12 @@ date: last-modified
 bibliography: ../manuscript/bibliography.bib
 link-citations: TRUE
 format: docx
+journal: 
+  name: Ecological Informatics
+  formatting: preprint
+  model: 1p
+  cite-style: authoryear
 
-#  pdf: default
-#  elsevier-pdf:
-#    keep-tex: true
-#    journal:
-#      name: Ecological Informatics
-#      formatting: preprint
-#      model: 1p
-#      cite-style: authoryear
 ---
 
 ```{r, load packages, include=FALSE}
@@ -306,7 +303,6 @@ prox <- magick::image_read('manuscript_files/satlantic_ici_proximity.png')%>%
   image_border(color="#ffffff", geometry = "260x125")%>%
   image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read('manuscript_files/satlantic_ici_importance.png')%>%
-  #image_border(color="#ffffff", geometry = "540x52")%>%
   image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
   image_annotate("c) Importance Heat Map", size=120, color = "black")

@@ -2,13 +2,13 @@
 title: Supplement for Open-Source machine learning BANTER acoustic classification of beaked whale echolocation pulses
 author: Shannon Rankin
 date: last-modified
-output: pdf
-#format: docx
+#output: pdf
+format: docx
 ---
 
 ```{r, load packages, include=FALSE}
 library("easypackages")
-libraries("tidyverse", "knitr", "kableExtra", "magick", "magrittr", "here")
+libraries("tidyverse", "knitr", "kableExtra", "magick", "magrittr", "ggplot2", "here")
 here()
 ```
 
@@ -25,18 +25,18 @@ Results for the NAtlantic EC (only) model are provided in @fig-natlantic_EC (Det
 #| out-width: 100%
 #| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_votes.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_proximity.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'natlantic_ec_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=120, color = "black")
   
 natlantic_ec_Figure <-image_append(c(prox, heat, vote))
 natlantic_ec_Figure<- image_append(c(confuse, natlantic_ec_Figure), stack=TRUE)
@@ -57,18 +57,18 @@ Results for the SAtlantic EC (only) model are provided in @fig-satlantic_EC (Det
 #| out-width: 100%
 #| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_votes.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_proximity.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_ec_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=120, color = "black")
   
 satlantic_ec_Figure <-image_append(c(prox, heat, vote))
 satlantic_ec_Figure<- image_append(c(confuse, satlantic_ec_Figure), stack=TRUE)
@@ -88,18 +88,18 @@ Results for the SAtlantic EC_IPI_ALT model are provided in @fig-satlantic_EC_IPI
 #| out-width: 100%
 #| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_votes.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_proximity.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'satlantic_alt_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=120, color = "black")
   
 satlantic_alt_Figure <-image_append(c(prox, heat, vote))
 satlantic_alt_Figure<- image_append(c(confuse, satlantic_alt_Figure), stack=TRUE)
@@ -120,18 +120,18 @@ Results for the Hawaii EC_IPI model are provided in @fig-hawaii_EC_IPI (Detector
 #| out-width: 100%
 #| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_votes.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_proximity.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'hawaii_ici_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=120, color = "black")
   
 hawaii_ici_Figure <-image_append(c(prox, heat, vote))
 hawaii_ici_Figure<- image_append(c(confuse, hawaii_ici_Figure), stack=TRUE)
@@ -151,18 +151,18 @@ Results for the EPacific EC (only) model are provided in @fig-epacific_EC (Detec
 #| out-width: 100%
 #| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_votes.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_proximity.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ec_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=120, color = "black")
   
 epacific_ec_Figure <-image_append(c(prox, heat, vote))
 epacific_ec_Figure<- image_append(c(confuse, epacific_ec_Figure), stack=TRUE)
@@ -182,18 +182,18 @@ Results for the EPacific EC (only) model are provided in @fig-epacific_EC_IPI (D
 #| out-width: 100%
 #| echo: false
 confuse <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_confuseMatrix.png'))%>%
-  image_border(color="#ffffff", geometry = "50x130")%>%
-  image_annotate("a) Confusion Matrix", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "80x208")%>%
+  image_annotate("a) Confusion Matrix", size=120, color = "black")
 vote <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_votes.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("d) Vote Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("d) Vote Plot", size=120, color = "black")
 prox <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_proximity.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
-  image_annotate("b) Proximity Plot", size=100, color = "black")
+  image_border(color="#ffffff", geometry = "260x125")%>%
+  image_annotate("b) Proximity Plot", size=120, color = "black")
 heat <- magick::image_read(here('manuscript', 'manuscript_files', 'epacific_ici_importance.png'))%>%
-  image_border(color="#ffffff", geometry = "270x130")%>%
+  image_border(color="#ffffff", geometry = "110x260")%>%
   image_scale("3300")%>%
-  image_annotate("d) Importance Heat Map", size=100, color = "black")
+  image_annotate("d) Importance Heat Map", size=120, color = "black")
   
 epacific_ici_Figure <-image_append(c(prox, heat, vote))
 epacific_ici_Figure<- image_append(c(confuse, epacific_ici_Figure), stack=TRUE)
