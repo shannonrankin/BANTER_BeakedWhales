@@ -42,6 +42,7 @@ including the [EPacific Detection
 Data](https://figshare.com/articles/dataset/CCES_2018_Acoustic_Study_Detection_Data/23319938)
 used in this analysis.
 
+***Reproduce Methods***
 If you would like to conduct a similar analysis on your datasets, you
 can analyze your data using:
 
