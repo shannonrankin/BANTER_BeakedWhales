@@ -1,10 +1,12 @@
 **BANTER for Beaked Whales**
 
-***Research Compendium*** for Rankin, et al (in review at Ecological
-Informatics), " Open-Source machine learning BANTER acoustic
+***Research Compendium*** for Rankin, et al (Ecological
+Informatics, https://doi.org/10.1016/j.ecoinf.2024.102511), " Open-Source machine learning BANTER acoustic
 classification of beaked whale echolocation pulses"
 
-***How to Cite:*** *will be provided when available*
+
+***How to Cite:*** 
+Rankin, S., Sakai, T., Archer, F. I., Barlow, J., Cholewiak, D., DeAngelis, A. I., ... & Trickey, J. S. (2024). Open-source machine learning BANTER acoustic classification of beaked whale echolocation pulses. Ecological Informatics, 80, 102511.
 
 ***Contents***
 
